@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Галилей коды</title>
+  <!-- TailwindCSS арқылы қосу -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    /* Негізгі анимациялар */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(50px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .fadeInUp {
+      animation: fadeInUp 1s ease-out forwards;
+    }
+    .slideInRight {
+      animation: slideInRight 1s ease-out forwards;
+    }
+    .fadeInScale {
+      animation: fadeInScale 1s ease-out forwards;
+    }
+    .animate-on-scroll {
+      opacity: 0;
+    }
+    /* Canvas баптаулары: hero-секциядағы анимация */
+    #backgroundAnimation {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1; /* Контенттен артта орналасады */
+    }
+    #home {
+      position: relative;
+      min-height: 90vh;
+      overflow: hidden;
+      background-color: transparent;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased">
+  
+  <!-- Навигациялық мәзір -->
+  <nav class="bg-gray-800 text-white fixed w-full z-10 shadow">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <!-- Логотип пен атын бірге орналастыру -->
+      <div class="flex items-center">
+        <img src="1.png" alt="Логотип" class="h-8 mr-2">
+        <span class="text-xl font-bold">Галилей коды</span>
+      </div>
+      <div class="space-x-4">
+        <a href="#home" class="px-3 hover:text-gray-400 transition transform hover:scale-105">Басты бет</a>
+        <a href="#about" class="px-3 hover:text-gray-400 transition transform hover:scale-105">Галилей туралы</a>
+        <a href="#discoveries" class="px-3 hover:text-gray-400 transition transform hover:scale-105">Ашылымдар</a>
+        <a href="#gallery" class="px-3 hover:text-gray-400 transition transform hover:scale-105">Галерея</a>
+        <a href="#experiments" class="px-3 hover:text-gray-400 transition transform hover:scale-105">Эксперименттер</a>
+        <a href="#quotes" class="px-3 hover:text-gray-400 transition transform hover:scale-105">Дәйексөздер мен фактілер</a>
+        <a href="#contact" class="px-3 hover:text-gray-400 transition transform hover:scale-105">Байланыс</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero-секция: Canvas анимациясы бар фон -->
+  <section id="home" class="pt-16 pb-20 animate-on-scroll fadeInUp">
+    <!-- Фондық анимация үшін Canvas -->
+    <canvas id="backgroundAnimation"></canvas>
+    <!-- Hero контенті -->
+    <div class="container mx-auto px-4 text-center text-black">
+      <h1 class="text-4xl md:text-6xl font-bold mb-4">Галилейдің ашылымдары</h1>
+      <p class="text-xl md:text-2xl mb-6">Ғылым, программалау, визуализация</p>
+      <p class="text-xl md:text-2xl mb-6">
+        E pur si muove! [epˈpur si ˈmwɔːve], тура аудармасы – «Бірақ ол әлі қозғалады!» — деген атақты сөз,
+        1633 жылы Галилео Галилей, астроном, философ және физик ретінде, Инквизиция алдында Жердің Күннің айналасында
+        қозғалады деп сенгенінен бас тартуға мәжбүр болған кезде айтылды.
+      </p>
+      <a href="#about" class="inline-block bg-blue-600 hover:bg-blue-700 transition px-6 py-3 rounded-full text-xl text-white">
+        Көбірек білу
+      </a>
+    </div>
+  </section>
+
+  <!-- "Галилей туралы" секциясы -->
+  <section id="about" class="py-12 bg-gray-100 animate-on-scroll fadeInUp">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold mb-8 text-center">Галилей туралы</h2>
+      <div class="flex flex-col md:flex-row items-center gap-8">
+        <!-- Галилео Галилейдің портреті (транспарант PNG) -->
+        <div class="w-full md:w-1/2 flex justify-center">
+          <img src="1.png" alt="Галилео Галилей" class="max-w-full h-auto slideInRight fadeInScale">
+        </div>
+        <!-- Мәтіндік ақпарат -->
+        <div class="w-full md:w-1/2">
+          <p class="text-lg leading-relaxed">
+            Галилео Галилей (1564–1642) — итальян астрономы, физигі және математигі. Оның қозғалыс заңдары мен ғарыш құрылымына
+            қатысты жаңашыл идеялары әлемдік көзқарасты өзгертті және қазіргі ғылымның негізін қалады.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- "Ашылымдар" секциясы -->
+  <section id="discoveries" class="py-12 animate-on-scroll fadeInUp">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold mb-8 text-center">Ашылымдар</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white shadow p-6 rounded transition transform hover:scale-105">
+          <h3 class="text-2xl font-semibold mb-2">Телескоп және астрономиялық бақылаулар</h3>
+          <p>
+            1609 жылы Галилео телескопты жетілдіріп, Ай тауларын, кратерлерін және Венераның фазаларын алғаш рет бақылады.
+          </p>
+        </div>
+        <div class="bg-white shadow p-6 rounded transition transform hover:scale-105">
+          <h3 class="text-2xl font-semibold mb-2">Қозғалыс заңдары</h3>
+          <p>
+            Галилео заттардың салмағына қарамай бірдей үдеу қарқынымен құлайтындығын дәлелдеді.
+          </p>
+        </div>
+        <div class="bg-white shadow p-6 rounded transition transform hover:scale-105">
+          <h3 class="text-2xl font-semibold mb-2">Юпитердің серіктерін бақылау</h3>
+          <p>
+            1610 жылы Галилео Юпитермнің төрт ірі серігін ашып, гелиоцентрлік жүйені растады.
+          </p>
+        </div>
+        <div class="bg-white shadow p-6 rounded transition transform hover:scale-105">
+          <h3 class="text-2xl font-semibold mb-2">Галилей vs Инквизиция</h3>
+          <p>
+            Ғылыми жетістіктеріне қарамастан, Галилео өз сенімінен бас тартуға мәжбүр болып, Инквизиция тарапынан қуғын-сүргінге ұшырады.
+          </p>
+        </div>
+      </div>
+      <!-- Студенттерден видео -->
+      <div class="mt-8">
+        <h3 class="text-2xl font-semibold mb-2 text-center">Студенттерден видео</h3>
+        <div class="flex justify-center">
+          <video controls width="640" class="rounded shadow">
+            <source src="video.mp4" type="video/mp4">
+            Сіздің браузеріңіз видеоны қолдамайды.
+          </video>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- "Галерея" секциясы (фотосуреттер мен түсініктемелері) -->
+  <section id="gallery" class="py-12 bg-gray-50 animate-on-scroll fadeInUp">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold mb-8 text-center">Галерея</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+        <figure class="relative">
+          <img src="2.png" alt="Жұмыс 1" class="w-full rounded shadow transition transform hover:scale-105">
+          <figcaption class="mt-2 text-center text-sm text-gray-700">
+            Алғашқы рет аспанға қарап, оны телескопқа айналдырған және жаңа ғылыми деректер алған Галилео Галилей. Өз телескопын 1609 жылы ойлап тапты.
+          </figcaption>
+        </figure>
+        <figure class="relative">
+          <img src="3.png" alt="Жұмыс 2" class="w-full rounded shadow transition transform hover:scale-105">
+          <figcaption class="mt-2 text-center text-sm text-gray-700">
+            1586 жылы Галилео арнайы гидростатикалық таразы жасап, денелердің тығыздығын анықтады. Оның құрылысы туралы «La bilancetta» еңбегінде сипатталған.
+          </figcaption>
+        </figure>
+        <figure class="relative">
+          <img src="4.png" alt="Жұмыс 3" class="w-full rounded shadow transition transform hover:scale-105">
+          <figcaption class="mt-2 text-center text-sm text-gray-700">
+            Галилео термометрі — тығыз жабылған шыны цилиндр, сұйықтықпен толтырылған, оның ішінде кішкентай шыны ыдыстар жүзеді.
+          </figcaption>
+        </figure>
+        <figure class="relative">
+          <img src="5.png" alt="Жұмыс 4" class="w-full rounded shadow transition transform hover:scale-105">
+          <figcaption class="mt-2 text-center text-sm text-gray-700">
+            Галилео Галилей сонымен қатар микроскопты ойлап табуға үміткерлердің бірі болып саналады. 1609 жылы ол «occhiolino» («оккиолино») – «кіші көз» деп аталатын, дөңгелек және шомылатын линзалардан тұратын микроскопты жасады.
+          </figcaption>
+        </figure>
+        <figure class="relative">
+          <img src="6.jpg" alt="Жұмыс 5" class="w-full rounded shadow transition transform hover:scale-105">
+          <figcaption class="mt-2 text-center text-sm text-gray-700">
+            Целатон – Галилео Галилей Юпитердің айларын бақылау арқылы Жердің бойлық координаталарын анықтау үшін ойлап тапқан құрылғы. Ол телескоппен жабдықталған бас киім түрінде болды.
+          </figcaption>
+        </figure>
+        <figure class="relative">
+          <img src="7.jpg" alt="Жұмыс 6" class="w-full rounded shadow transition transform hover:scale-105">
+          <figcaption class="mt-2 text-center text-sm text-gray-700">
+            Бұрыштар мен еңкесті өлшеуге арналған құрылғылар
+          </figcaption>
+        </figure>
+        <figure class="relative">
+          <img src="8.jpg" alt="Жұмыс 7" class="w-full rounded shadow transition transform hover:scale-105">
+          <figcaption class="mt-2 text-center text-sm text-gray-700">
+            1606 жылы Галилео ғылыми мақала жариялап, өз ойлап тапқан пропорционалдық циркульдің идеясы мен сызбаларын көрсетті. Бұл құрал өлшемдерді өзгертуге мүмкіндік береді.
+          </figcaption>
+        </figure>
+        <figure class="relative">
+          <img src="9.jpg" alt="Жұмыс 8" class="w-full rounded shadow transition transform hover:scale-105">
+          <figcaption class="mt-2 text-center text-sm text-gray-700">
+            Мэттью Докрейдің «Целатоны». Музей
+          </figcaption>
+        </figure>
+        <figure class="relative">
+          <img src="10.jpg" alt="Жұмыс 9" class="w-full rounded shadow transition transform hover:scale-105">
+          <figcaption class="mt-2 text-center text-sm text-gray-700">
+            Галилео Галилейдің сағаттың төмен түсіру механизмін — итальян ғалымының 1637 жылы ойлап тапқан өнертабысы.
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- "Эксперименттер" секциясы -->
+  <section id="experiments" class="py-12 bg-gray-100 animate-on-scroll fadeInUp">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold mb-8 text-center">Эксперименттер</h2>
+      <p class="text-center mb-6">
+        Дене құлауының анимациясын бақылаңыз – қозғалыс заңдарының көркем бейнесі!
+      </p>
+      <div class="flex justify-center">
+        <canvas id="fallingBallsCanvas" width="800" height="400"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- "Дәйексөздер мен фактілер" секциясы -->
+  <section id="quotes" class="py-12 animate-on-scroll fadeInUp">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold mb-8 text-center">Дәйексөздер мен фактілер</h2>
+      <div class="space-y-6">
+        <blockquote class="bg-white p-6 rounded shadow italic border-l-4 border-blue-500">
+          "Табиғат заңдары математикалық тілде жазылған."
+        </blockquote>
+        <blockquote class="bg-white p-6 rounded shadow italic border-l-4 border-blue-500">
+          "Жұлдыздардың өзін-өзі жай күйіп жатқан доптар екеніне сенбеймін!"
+        </blockquote>
+        <p class="text-center mt-4 text-sm text-gray-600">
+          Факт: Галилео астрономияда ғылыми әдісті алғаш қолданғандардың бірі болды.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- "Байланыс" секциясы -->
+  <section id="contact" class="py-12 bg-gray-50 animate-on-scroll fadeInUp">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold mb-8 text-center">Байланыс және сілтемелер</h2>
+      <p class="text-center mb-4">
+        Галилей және оның ашылымдары туралы көбірек білу үшін төмендегі ресурстарды қараңыз:
+      </p>
+      <div class="flex justify-center space-x-4">
+        <a href="https://www.biography.com/scientist/galileo" target="_blank" class="text-blue-600 hover:underline transition">
+          Биография
+        </a>
+        <a href="https://www.britannica.com/biography/Galileo-Galilei" target="_blank" class="text-blue-600 hover:underline transition">
+          Britannica
+        </a>
+        <a href="https://ru.wikipedia.org/wiki/%D0%93%D0%B0%D0%BB%D0%B8%D0%BB%D0%B5%D0%BE_%D0%93%D0%B0%D0%BB%D0%B8%D0%BB%D0%B5%D0%B9" target="_blank" class="text-blue-600 hover:underline transition">
+          Уикипедия
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Футер -->
+  <footer class="bg-gray-800 text-white py-4">
+    <div class="container mx-auto px-4 text-center">
+      &copy; 2025 Галилей коды. Барлық құқықтар қорғалған.
+    </div>
+  </footer>
+
+  <!-- "Жоғарыға қайту" батырмасы -->
+  <button id="backToTop" class="fixed bottom-8 right-8 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg hidden transition transform hover:scale-110">
+    ↑
+  </button>
+
+  <!-- Скрипттер -->
+  <script>
+    // ===== Класс Sprite: суреттерді бейнелеу =====
+    class Sprite {
+      // width және height - суреттің өлшемдері, imageSrc — файлдың жолы
+      constructor(x, y, width, height, imageSrc, speedX, speedY) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.speedX = speedX;
+        this.speedY = speedY;
+        this.image = new Image();
+        this.image.src = imageSrc;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+      }
+      draw(ctx) {
+        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+      }
+    }
+
+    // ===== Hero-секциядағы фондық анимация: "Галилей преследовшылардан қашады" =====
+    document.addEventListener("DOMContentLoaded", () => {
+      const canvas = document.getElementById("backgroundAnimation");
+      const ctx = canvas.getContext("2d");
+      
+      // Canvas өлшемін #home секциясына бейімдеу
+      function resizeCanvas() {
+        const homeSection = document.getElementById("home");
+        canvas.width = homeSection.offsetWidth;
+        canvas.height = homeSection.offsetHeight;
+      }
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+
+      // Спрайттар массиві: бір Галилей және бірнеше преследовшылар
+      const sprites = [];
+
+      // Галилей: "galileo.png" суреті, өлшемі 50x50, старт (50,100), X бойынша жылдамдығы 3
+      sprites.push(new Sprite(50, 100, 50, 50, "11.png", 3, 0));
+
+      // Преследовшылар: "pursuer.png" тәрізді суреттер; әрқайсысы 40x40, әртүрлі Y координаталарында, X бойынша жылдамдықтары 2.1, 2.11, 2.13
+      for (let i = 0; i < 1; i++) {
+        const startY = 100 + (i + 1) * 60;
+        sprites.push(new Sprite(10, startY, 40, 40, "14.png", 2.1, 0));
+        sprites.push(new Sprite(10, startY, 40, 40, "12.png", 2.11, 0));
+        sprites.push(new Sprite(10, startY, 40, 40, "13.png", 2.13, 0));
+      }
+
+      function animateBackground() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        sprites.forEach(sprite => {
+          sprite.update();
+          // Егер спрайт оң жақ шетіне шықса, оны қайта басына орналастырамыз
+          if (sprite.x - sprite.width > canvas.width) {
+            sprite.x = -sprite.width;
+          }
+          sprite.draw(ctx);
+        });
+        requestAnimationFrame(animateBackground);
+      }
+      animateBackground();
+    });
+
+    // ===== "Эксперименттер" секциясы: құлау анимациясы =====
+    document.addEventListener("DOMContentLoaded", function () {
+      const canvasBalls = document.getElementById("fallingBallsCanvas");
+      const ctxBalls = canvasBalls.getContext("2d");
+      const balls = [];
+      const ballCount = 20;
+      for (let i = 0; i < ballCount; i++) {
+        balls.push({
+          x: Math.random() * canvasBalls.width,
+          y: Math.random() * -canvasBalls.height,
+          radius: 10 + Math.random() * 10,
+          speed: 2 + Math.random() * 3,
+          color: "hsl(" + Math.floor(Math.random() * 360) + ", 70%, 50%)"
+        });
+      }
+      function drawBalls() {
+        ctxBalls.clearRect(0, 0, canvasBalls.width, canvasBalls.height);
+        balls.forEach(ball => {
+          ctxBalls.beginPath();
+          ctxBalls.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+          ctxBalls.fillStyle = ball.color;
+          ctxBalls.fill();
+          ball.y += ball.speed;
+          if (ball.y - ball.radius > canvasBalls.height) {
+            ball.y = -ball.radius;
+            ball.x = Math.random() * canvasBalls.width;
+          }
+        });
+        requestAnimationFrame(drawBalls);
+      }
+      drawBalls();
+    });
+
+    // ===== Скролл кезінде элементтердің пайда болуы =====
+    document.addEventListener("DOMContentLoaded", function () {
+      const animatedElements = document.querySelectorAll(".animate-on-scroll");
+      const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!entry.target.classList.contains("fadeInUp")) {
+              entry.target.classList.add("fadeInUp");
+            }
+            entry.target.classList.remove("opacity-0");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      animatedElements.forEach(el => observer.observe(el));
+    });
+
+    // ===== "Жоғарыға қайту" батырмасы =====
+    const backToTopButton = document.getElementById("backToTop");
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 300) {
+        backToTopButton.classList.remove("hidden");
+      } else {
+        backToTopButton.classList.add("hidden");
+      }
+    });
+    backToTopButton.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>
