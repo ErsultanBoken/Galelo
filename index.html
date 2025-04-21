@@ -9,6 +9,7 @@
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- Google Fonts: Open Sans, Space Mono, Roboto -->
+  <link rel="shortcut icon" href="1.png" />
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Space+Mono:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <!-- Lightbox -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
@@ -577,6 +578,56 @@
       75% { box-shadow: inset -12px 0 5px rgba(0,0,0,0.5); }
       100% { box-shadow: inset 0 0 2px rgba(0,0,0,0.5); }
     }
+    .quotes-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 1rem;
+    }
+    .quote-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .quote-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    .quote-card::before {
+      content: '“';
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      font-size: 4rem;
+      color: rgba(59, 130, 246, 0.3);
+      z-index: 0;
+    }
+    .quote-card p {
+      font-size: 1.5rem;
+      font-style: italic;
+      color: #e2e8f0;
+      position: relative;
+      z-index: 1;
+    }
+    .quote-card cite {
+      display: block;
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      color: #94a3b8;
+    }
+    @media (max-width: 768px) {
+      .quote-card p {
+        font-size: 1.2rem;
+      }
+      .quote-card cite {
+        font-size: 1rem;
+      }
+    }
     #mercury .planet { background-image: url('http://testrusunivers.ucoz.site/DESIGN/solarsystem/img/mercury.png'); }
     #venus .planet { background-image: url('http://testrusunivers.ucoz.site/DESIGN/solarsystem/img/venus.png'); }
     #earth .planet { background-image: url('http://testrusunivers.ucoz.site/DESIGN/solarsystem/img/earth.png'); }
@@ -667,51 +718,132 @@
     </div>
   </section>
 
-  <!-- About Section -->
-  <section id="about" class="py-16 bg-slate-800 animate-on-scroll fadeInUp">
-    <div class="container mx-auto px-4">
-      <h2 class="text-4xl font-bold mb-10 text-center">Галилей туралы</h2>
-      <div class="flex flex-col md:flex-row items-center gap-12">
-        <div class="w-full md:w-1/2 flex justify-center">
-          <img src="11.png" alt="Галилео Галилей" class="max-w-full h-auto rounded-lg shadow-xl" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=Galileo+Portrait'">
+<!-- About Section -->
+<section id="about" class="py-20 bg-slate-800 animate-on-scroll fadeInUp relative overflow-hidden">
+  <div class="container mx-auto px-6 relative z-10">
+    <h2 class="text-5xl font-bold mb-4 text-center text-white font-['Space_Mono']">Галилей туралы</h2>
+    <div class="w-32 h-1 bg-blue-400 mx-auto mb-12 rounded-full"></div>
+    <div class="flex flex-col md:flex-row items-start gap-12">
+      <!-- Image Block -->
+      <div class="w-full md:w-2/5 flex justify-center md:justify-start">
+        <div class="relative group">
+          <img src="11.png" alt="Галилео Галилей" class="w-96 h-auto rounded-xl shadow-2xl transition-transform duration-500 group-hover:scale-105 group-hover:shadow-[0_0_30px_rgba(59,130,246,0.5)]" loading="lazy" onerror="this.src='https://via.placeholder.com/400?text=Galileo+Portrait'">
+          <div class="absolute inset-0 rounded-xl bg-gradient-to-t from-slate-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <!-- Decorative Frame -->
+          <div class="absolute inset-0 rounded-xl border-2 border-[rgba(59,130,246,0.3)] opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
         </div>
-        <div class="w-full md:w-1/2">
-          <p class="text-lg leading-relaxed mb-4">
-            Галилео Галилей (15 ақпан 1564 – 8 қаңтар 1642) — итальяндық астроном, физик, математик және философ, қазіргі ғылымның негізін қалаушылардың бірі. Ол Пизаның жанындағы Арчетриде дүниеге келді және Падуя университетінде білім алды. Галилей телескопты жетілдіріп, Юпитердің төрт серігін (қазір Галилей серіктері деп аталады) ашты, Айдың бетін, Күннің дақтарын және Венераның фазаларын бақылады. Бұл ашылымдар Коперниктің гелиоцентрлік теориясын қолдады.
+      </div>
+      <!-- Text -->
+      <div class="w-full md:w-2/3">
+        <div class="bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-8 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl">
+          <p class="text-lg leading-relaxed mb-6 text-slate-200 font-['Roboto']">
+            <span class="text-blue-400 font-semibold">Галилео Галилей</span> (15 ақпан 1564 – 8 қаңтар 1642) — итальяндық астроном, физик, математик және философ, қазіргі ғылымның негізін қалаушылардың бірі. Пизаның жанындағы Арчетриде дүниеге келген ол Падуя университетінде білім алды. Галилей телескопты жетілдіріп, <span class="italic">Юпитердің төрт серігін</span> (қазір Галилей серіктері деп аталады) ашты, Айдың бетін, Күннің дақтарын және Венераның фазаларын бақылады. Бұл ашылымдар Коперниктің гелиоцентрлік теориясын растады.
           </p>
-          <p class="text-lg leading-relaxed mb-4">
-            Галилейдің қозғалыс заңдары классикалық механиканың негізін қалады. Ол еркін түсу эксперименттері арқылы барлық денелер бірдей үдеумен құлайтынын дәлелдеді. Оның маятникті зерттеуі уақытты дәл өлшеуге мүмкіндік берді, бұл кейін сағат жасауда қолданылды. Галилей сонымен қатар пропорционалдық циркуль және басқа да өлшеу құралдарын ойлап тапты.
+          <p class="text-lg leading-relaxed mb-6 text-slate-200 font-['Roboto']">
+            Галилейдің <span class="text-blue-400 font-semibold">қозғалыс заңдары</span> классикалық механиканың негізін қалады. Ол еркін түсу эксперименттері арқылы барлық денелер бірдей үдеумен құлайтынын дәлелдеді. Маятникті зерттеуі уақытты дәл өлшеуге мүмкіндік берді, бұл кейін сағат жасауда қолданылды. Сонымен қатар, ол пропорционалдық циркуль және басқа да инновациялық өлшеу құралдарын ойлап тапты.
           </p>
-          <p class="text-lg leading-relaxed">
-            Оның гелиоцентризмді қолдағаны үшін католиктік шіркеумен қақтығысы болды. 1633 жылы инквизиция оны Коперниктің ілімінен бас тартуға мәжбүр етті және өмірінің соңына дейін үй қамауында болды. Дегенмен, оның идеялары ғылымның дамуына үлкен әсер етті, және ол қазіргі ғылыми әдістің пионері ретінде танылады.
+          <p class="text-lg leading-relaxed text-slate-200 font-['Roboto']">
+            Гелиоцентризмді қолдағаны үшін Галилей католиктік шіркеумен қақтығысқа түсті. 1633 жылы инквизиция оны Коперниктің ілімінен бас тартуға мәжбүр етті және өмірінің соңына дейін үй қамауында ұстады. Дегенмен, оның идеялары ғылымның дамуына орасан зор әсер етті, және ол <span class="text-blue-400 font-semibold">қазіргі ғылыми әдістің пионері</span> ретінде мәңгі есте қалды.
           </p>
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- Discoveries Section -->
-  <section id="discoveries" class="py-16 bg-slate-900 animate-on-scroll fadeInUp">
-    <div class="container mx-auto px-4">
-      <h2 class="text-4xl font-bold mb-10 text-center text-white">Ашылымдар</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="card bg-slate-800 p-6 rounded-lg shadow-lg">
-          <h3 class="text-2xl font-semibold mb-3">Телескоп</h3>
-          <p>1609 жылы Галилео телескопты жетілдіріп, Айдың кратерлерін, Күн дақтарын және Венераның фазаларын бақылады.</p>
+  </div>
+  <!-- Background Decorative Element -->
+  <div class="absolute top-0 left-0 w-full h-full opacity-10 z-0">
+    <svg viewBox="0 0 100 100" class="w-full h-full">
+      <circle cx="50" cy="50" r="40" stroke="rgba(59,130,246,0.3)" stroke-width="1" fill="none"/>
+      <circle cx="20" cy="20" r="10" fill="rgba(59,130,246,0.2)"/>
+      <circle cx="80" cy="80" r="15" fill="rgba(59,130,246,0.2)"/>
+    </svg>
+  </div>
+</section>
+  <section id="discoveries" class="py-20 bg-slate-900 animate-on-scroll fadeInUp relative overflow-hidden">
+    <div class="container mx-auto px-6 relative z-10">
+      <h2 class="text-5xl font-bold mb-4 text-center text-white font-['Space_Mono']">Ашылымдар</h2>
+      <div class="w-32 h-1 bg-gradient-to-r from-blue-500 to-blue-300 mx-auto mb-12 rounded-full"></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Card 1 -->
+        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Телескоп</h3>
+          <p class="text-slate-200 font-['Roboto'] relative z-10">1609 жылы Галилео телескопты жетілдіріп, Айдың кратерлерін, Күн дақтарын және Венераның фазаларын бақылады.</p>
         </div>
-        <div class="card bg-slate-800 p-6 rounded-lg shadow-lg">
-          <h3 class="text-2xl font-semibold mb-3">Қозғалыс заңдары</h3>
-          <p>Денелер салмағына қарамастан бірдей үдеумен құлайды, бұл механиканың негізі болды.</p>
+        <!-- Card 2 -->
+        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Қозғалыс заңдары</h3>
+          <p class="text-slate-200 font-['Roboto'] relative z-10">Денелер салмағына қарамастан бірдей үдеумен құлайтынын дәлелдеді, бұл механиканың негізі болды.</p>
         </div>
-        <div class="card bg-slate-800 p-6 rounded-lg shadow-lg">
-          <h3 class="text-2xl font-semibold mb-3">Юпитердің серіктері</h3>
-          <p>1610 жылы төрт серік (Ио, Европа, Ганимед, Каллисто) ашып, гелиоцентризмді растады.</p>
+        <!-- Card 3 -->
+        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Юпитердің серіктері</h3>
+          <p class="text-slate-200 font-['Roboto'] relative z-10">1610 жылы төрт серік (Ио, Европа, Ганимед, Каллисто) ашып, гелиоцентризмді растады.</p>
         </div>
-        <div class="card bg-slate-800 p-6 rounded-lg shadow-lg">
-          <h3 class="text-2xl font-semibold mb-3">Инквизиция</h3>
-          <p>Галилейдің гелиоцентризмді қолдағаны үшін 1633 жылы сотталып, үй қамауында болды.</p>
+        <!-- Card 4 -->
+        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Инквизиция</h3>
+          <p class="text-slate-200 font-['Roboto'] relative z-10">Гелиоцентризмді қолдағаны үшін 1633 жылы сотталып, үй қамауында болды.</p>
+        </div>
+        <!-- Card 5 -->
+        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Маятник</h3>
+          <p class="text-slate-200 font-['Roboto'] relative z-10">Маятникті зерттеу арқылы уақытты дәл өлшеудің әдісін ашты, сағат жасауға әсер етті.</p>
+        </div>
+        <!-- Card 6 -->
+        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Гелиоцентризм</h3>
+          <p class="text-slate-200 font-['Roboto'] relative z-10">Коперниктің гелиоцентрлік теориясын қолдап, Жердің Күнді айналатынын дәлелдеді.</p>
+        </div>
+        <!-- Card 7 -->
+        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Пропорционалдық циркуль</h3>
+          <p class="text-slate-200 font-['Roboto'] relative z-10">Математикалық есептеулерді жеңілдететін пропорционалдық циркуль ойлап тапты.</p>
+        </div>
+        <!-- Card 8 -->
+        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Күн дақтары</h3>
+          <p class="text-slate-200 font-['Roboto'] relative z-10">Күннің дақтарын бақылап, Күннің өз осінен айналатынын анықтады.</p>
+        </div>
+        <!-- Card 9 -->
+        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Термометр</h3>
+          <p class="text-slate-200 font-['Roboto'] relative z-10">Температураны өлшеуге арналған алғашқы термометрдің прототипін жасады.</p>
+        </div>
+        <!-- Card 10 -->
+        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Микроскоп</h3>
+          <p class="text-slate-200 font-['Roboto'] relative z-10">Оптикалық құралдарды жетілдіріп, микроскоптың алғашқы нұсқасын құрастырды.</p>
+        </div>
+        <!-- Card 11 -->
+        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Математика</h3>
+          <p class="text-slate-200 font-['Roboto'] relative z-10">Табиғат заңдарын математикалық тілде сипаттаудың маңыздылығын дәлелдеді.</p>
+        </div>
+        <!-- Card 12 -->
+        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Айдың кратерлері</h3>
+          <p class="text-slate-200 font-['Roboto'] relative z-10">Айдың бетіндегі кратерлерді алғаш рет бақылап, оның тегіс емес екенін көрсетті.</p>
         </div>
       </div>
+    </div>
+    <!-- Background Decorative Element -->
+    <div class="absolute top-0 left-0 w-full h-full opacity-10 z-0">
+      <svg viewBox="0 0 100 100" class="w-full h-full">
+        <circle cx="50" cy="50" r="40" stroke="rgba(59,130,246,0.3)" stroke-width="1" fill="none"/>
+        <circle cx="20" cy="20" r="10" fill="rgba(59,130,246,0.2)"/>
+        <circle cx="80" cy="80" r="15" fill="rgba(59,130,246,0.2)"/>
+      </svg>
     </div>
   </section>
 
@@ -720,165 +852,387 @@
     <div class="gallery-container">
       <h2 class="text-4xl font-bold mb-12 text-center text-white">Галерея</h2>
       <div class="gallery-grid">
-        <figure class="gallery-item">
-          <a href="1.png" data-lightbox="galileo" data-title="Портрет Галилея">
-            <img src="1.png" alt="Портрет Галилея" class="rounded-lg w-full object-cover">
-          </a>
-          <figcaption>Портрет Галилея</figcaption>
+        <figure class="gallery-item" data-src="2.png" data-caption="Галилея телескопы, 1609">
+          <img src="2.png" alt="Галилея телескопы" class="rounded-lg w-full object-cover">
+          <figcaption>Галилея телескопы, 1609</figcaption>
         </figure>
-        <figure class="gallery-item">
-          <a href="2.png" data-lightbox="galileo" data-title="Телескоп Галилея, 1609">
-            <img src="2.png" alt="Телескоп Галилея" class="rounded-lg w-full object-cover">
-          </a>
-          <figcaption>Телескоп Галилея, 1609</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <a href="3.png" data-lightbox="galileo" data-title="Гидростатикалық таразы">
-            <img src="3.png" alt="Гидростатикалық таразы" class="rounded-lg w-full object-cover">
-          </a>
+        <figure class="gallery-item" data-src="3.png" data-caption="Гидростатикалық таразы">
+          <img src="3.png" alt="Гидростатикалық таразы" class="rounded-lg w-full object-cover">
           <figcaption>Гидростатикалық таразы</figcaption>
         </figure>
-        <figure class="gallery-item">
-          <a href="4.png" data-lightbox="galileo" data-title="Градусник Галилео">
-            <img src="4.png" alt="Градусник Галилео" class="rounded-lg w-full object-cover">
-          </a>
-          <figcaption>Градусник Галилео</figcaption>
+        <figure class="gallery-item" data-src="4.png" data-caption="Галелео термометірі">
+          <img src="4.png" alt="Галелео термометірі" class="rounded-lg w-full object-cover">
+          <figcaption>Галелео термометірі</figcaption>
         </figure>
-        <figure class="gallery-item">
-          <a href="5.png" data-lightbox="galileo" data-title="Микроскоп Галилея">
-            <img src="5.png" alt="Микроскоп Галилея" class="rounded-lg w-full object-cover">
-          </a>
+        <figure class="gallery-item" data-src="5.png" data-caption="Микроскоп Галилея">
+          <img src="5.png" alt="Микроскоп Галилея" class="rounded-lg w-full object-cover">
           <figcaption>Микроскоп Галилея</figcaption>
         </figure>
-        <figure class="gallery-item">
-          <a href="6.jpg" data-lightbox="galileo" data-title="Целатон Галилея">
-            <img src="6.jpg" alt="Целатон Галилея" class="rounded-lg w-full object-cover">
-          </a>
-          <figcaption>Целатон Галилея</figcaption>
+        <figure class="gallery-item" data-src="6.jpg" data-caption="Галелео целатоны">
+          <img src="6.jpg" alt="Галелео целатоны" class="rounded-lg w-full object-cover">
+          <figcaption>Галелео целатоны</figcaption>
         </figure>
-        <figure class="gallery-item">
-          <a href="7.jpg" data-lightbox="galileo" data-title="Пропорционалдық циркуль">
-            <img src="7.jpg" alt="Пропорционалдық циркуль" class="rounded-lg w-full object-cover">
-          </a>
+        <figure class="gallery-item" data-src="7.jpg" data-caption="Микрометр Галелео">
+          <img src="7.jpg" alt="Микрометр Галелео" class="rounded-lg w-full object-cover">
+          <figcaption>Микрометр Галелео</figcaption>
+        </figure>
+        <figure class="gallery-item" data-src="8.jpg" data-caption="Пропорционалдық циркуль">
+          <img src="8.jpg" alt="Пропорционалдық циркуль" class="rounded-lg w-full object-cover">
           <figcaption>Пропорционалдық циркуль</figcaption>
         </figure>
-        <figure class="gallery-item">
-          <a href="8.jpg" data-lightbox="galileo" data-title="Измерительный инструмент">
-            <img src="8.jpg" alt="Измерительный инструмент" class="rounded-lg w-full object-cover">
-          </a>
-          <figcaption>Измерительный инструмент</figcaption>
+        <figure class="gallery-item" data-src="9.jpg" data-caption="Галелео целатоны">
+          <img src="9.jpg" alt="Галелео целатоны" class="rounded-lg w-full object-cover">
+          <figcaption>Галелео целатоны</figcaption>
         </figure>
-        <figure class="gallery-item">
-          <a href="9.jpg" data-lightbox="galileo" data-title="Часы Галилея">
-            <img src="9.jpg" alt="Часы Галилея" class="rounded-lg w-full object-cover">
-          </a>
-          <figcaption>Часы Галилея</figcaption>
+        <figure class="gallery-item" data-src="10.jpg" data-caption="Галелео сағат механизмі">
+          <img src="10.jpg" alt="Галелео сағат механизмі" class="rounded-lg w-full object-cover">
+          <figcaption>Галелео сағат механизмі</figcaption>
         </figure>
-        <figure class="gallery-item">
-          <a href="10.jpg" data-lightbox="galileo" data-title="Портрет Галилея (музей)">
-            <img src="10.jpg" alt="Портрет Галилея (музей)" class="rounded-lg w-full object-cover">
-          </a>
-          <figcaption>Портрет Галилея (музей)</figcaption>
-        </figure>
-        <figure class="gallery-item">
-          <a href="2.png" data-lightbox="galileo" data-title="Телескоп Галилея (музейная копия)">
-            <img src="2.png" alt="Телескоп Галилея (музейная копия)" class="rounded-lg w-full object-cover">
-          </a>
-          <figcaption>Телескоп Галилея (музейная копия)</figcaption>
+        <figure class="gallery-item" data-src="2.png" data-caption="Галелео телескопы(Музей моделі)">
+          <img src="2.png" alt="Галелео телескопы" class="rounded-lg w-full object-cover">
+          <figcaption>Галелео телескопы(Музей моделі)</figcaption>
         </figure>
       </div>
+    </div>
+    <!-- Image Modal -->
+    <div class="image-modal" id="imageModal">
+      <button class="close-btn">Жабу</button>
+      <img src="" alt="Full-screen image">
+      <figcaption></figcaption>
     </div>
   </section>
 
-  <!-- Experiments Section -->
-  <section id="experiments" class="py-16 bg-slate-900 animate-on-scroll fadeInUp">
-    <div class="container mx-auto px-4">
-      <h2 class="text-4xl font-bold mb-10 text-center">Эксперименттер</h2>
-      <!-- Falling Bodies Experiment -->
-      <div class="mb-12">
-        <h3 class="text-2xl font-semibold mb-4 text-center">Падающие тела</h3>
-        <p class="text-center mb-6">Галилейдің заңы: денелер салмағына қарамастан бірдей үдеумен құлайды.</p>
-        <div class="experiment-controls">
-          <label class="text-white">Масса шара 1: <input id="mass1" type="number" value="20" min="10" max="50"></label>
-          <label class="text-white">Масса шара 2: <input id="mass2" type="number" value="10" min="10" max="50"></label>
-          <label class="text-white">Гравитация: <input id="gravity" type="number" value="0.4" min="0.1" max="1.0" step="0.1"></label>
-          <button id="resetFallingBodies" class="btn-animated">Запустить/Сбросить</button>
-        </div>
-        <div class="flex justify-center">
-          <canvas id="fallingBodiesCanvas" width="800" height="400" class="experiment-canvas"></canvas>
-        </div>
+  <!-- CSS Styles (добавить в <style> тег или отдельный CSS файл) -->
+  <style>
+    /* Gallery Styles */
+    .gallery-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      padding: 1rem;
+    }
+    .gallery-item {
+      position: relative;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+    }
+    .gallery-item:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+    .gallery-item figcaption {
+      padding: 1rem;
+      text-align: center;
+      font-size: 1rem;
+      color: #e2e8f0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(5px);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .gallery-item:hover figcaption {
+      opacity: 1;
+    }
+    .gallery-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1;
+    }
+    .gallery-item:hover::before {
+      opacity: 1;
+    }
+    @media (max-width: 768px) {
+      .gallery-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+      .gallery-item img {
+        height: 180px;
+      }
+    }
+    @media (max-width: 480px) {
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+      .gallery-item img {
+        height: 200px;
+      }
+    }
+
+    /* Full-screen Image Modal */
+    .image-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .image-modal img {
+      max-width: 90%;
+      max-height: 80%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    .image-modal figcaption {
+      color: #e2e8f0;
+      font-size: 1.5rem;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .image-modal .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #3b82f6;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .image-modal .close-btn:hover {
+      background: #2563eb;
+    }
+  </style>
+
+  <!-- JavaScript (добавить в <script> тег или отдельный JS файл) -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const galleryItems = document.querySelectorAll(".gallery-item");
+      const modal = document.getElementById("imageModal");
+      const modalImg = modal.querySelector("img");
+      const modalCaption = modal.querySelector("figcaption");
+      const closeBtn = modal.querySelector(".close-btn");
+
+      galleryItems.forEach(item => {
+        item.addEventListener("click", () => {
+          modalImg.src = item.dataset.src;
+          modalCaption.textContent = item.dataset.caption;
+          modal.style.display = "flex";
+        });
+      });
+
+      closeBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+      });
+
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          modal.style.display = "none";
+        }
+      });
+    });
+  </script>
+
+<!-- Experiments Section -->
+<section id="experiments" class="py-20 bg-slate-900 animate-on-scroll fadeInUp relative overflow-hidden">
+  <div class="container mx-auto px-6 relative z-10">
+    <h2 class="text-5xl font-bold mb-4 text-center text-white font-['Space_Mono'] relative">
+      <span class="relative z-10">Эксперименттер</span>
+      <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-transparent opacity-30 -z-10 blur-xl"></div>
+    </h2>
+    <div class="w-32 h-1 bg-gradient-to-r from-blue-500 to-blue-300 mx-auto mb-12 rounded-full"></div>
+    <!-- Falling Bodies Experiment -->
+    <div class="mb-12">
+      <h3 class="text-2xl font-semibold mb-4 text-center text-blue-300 font-['Space_Mono']">Құлайтын денелер</h3>
+      <p class="text-center mb-6 text-slate-200 font-['Roboto']">Галилей заңы: денелердің салмағына қарамастан бірдей үдеумен құлайтыны.</p>
+      <div class="experiment-controls flex justify-center space-x-6 flex-wrap gap-y-4 bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl">
+        <label class="text-white font-['Roboto']">1-ші шардың массасы: <input id="mass1" type="number" value="20" min="10" max="50" class="bg-slate-700 text-white rounded-md px-2 py-1"></label>
+        <label class="text-white font-['Roboto']">2-ші шардың массасы: <input id="mass2" type="number" value="10" min="10" max="50" class="bg-slate-700 text-white rounded-md px-2 py-1"></label>
+        <label class="text-white font-['Roboto']">Гравитация: <input id="gravity" type="number" value="0.4" min="0.1" max="1.0" step="0.1" class="bg-slate-700 text-white rounded-md px-2 py-1"></label>
+        <button id="resetFallingBodies" class="group relative bg-blue-600 px-4 py-2 rounded-md text-white font-['Roboto'] font-semibold transition-all duration-500 hover:bg-blue-500 hover:shadow-[0_5px_15px_rgba(59,130,246,0.5)]">Іске қосу/Қайтару</button>
       </div>
-      <!-- Pendulum Experiment -->
-      <div class="mb-12">
-        <h3 class="text-2xl font-semibold mb-4 text-center">Маятник</h3>
-        <p class="text-center mb-6">Маятниктің тербеліс периоды ұзындығына байланысты.</p>
-        <div class="experiment-controls">
-          <label class="text-white">Ұзындығы: <input id="pendulumLength" type="range" min="100" max="350" value="300"></label>
-          <label class="text-white">Бастапқы бұрыш: <input id="pendulumAngle" type="number" value="45" min="10" max="90"></label>
-          <button id="resetPendulum" class="btn-animated">Запустить/Сбросить</button>
-        </div>
-        <div class="flex justify-center">
-          <canvas id="pendulumCanvas" width="800" height="400" class="experiment-canvas"></canvas>
-        </div>
-      </div>
-      <!-- Telescope Experiment -->
-      <div class="mb-12">
-        <h3 class="text-2xl font-semibold mb-4 text-center">Телескоптік бақылау</h3>
-        <p class="text-center mb-6">Наведите курсор для увеличения звезд.</p>
-        <div class="experiment-controls">
-          <label class="text-white">Жұлдыздар саны: <input id="starCount" type="number" value="50" min="10" max="200"></label>
-          <label class="text-white">Макс. масштаб: <input id="starScale" type="number" value="1.5" min="1.0" max="3.0" step="0.1"></label>
-          <button id="resetTelescope" class="btn-animated">Запустить/Сбросить</button>
-        </div>
-        <div class="flex justify-center">
-          <canvas id="telescopeCanvas" width="800" height="400" class="experiment-canvas"></canvas>
-        </div>
-      </div>
-      <!-- Jupiter Moons Experiment -->
-      <div class="mb-12">
-        <h3 class="text-2xl font-semibold mb-4 text-center">Юпитердің серіктері</h3>
-        <p class="text-center mb-6">Скорость орбит спутников Юпитера.</p>
-        <div class="experiment-controls">
-          <label class="text-white">Скорость: <input id="moonSpeed" type="range" min="0.005" max="0.05" step="0.005" value="0.02"></label>
-          <label class="text-white">Серіктер саны: <input id="moonCount" type="number" value="4" min="1" max="6"></label>
-          <button id="resetJupiterMoons" class="btn-animated">Запустить/Сбросить</button>
-        </div>
-        <div class="flex justify-center">
-          <canvas id="jupiterMoonsCanvas" width="800" height="400" class="experiment-canvas"></canvas>
-        </div>
+      <div class="flex justify-center mt-6">
+        <canvas id="fallingBodiesCanvas" width="800" height="400" class="experiment-canvas rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl"></canvas>
       </div>
     </div>
-  </section>
+    <!-- Pendulum Experiment -->
+    <div class="mb-12">
+      <h3 class="text-2xl font-semibold mb-4 text-center text-blue-300 font-['Space_Mono']">Маятник</h3>
+      <p class="text-center mb-6 text-slate-200 font-['Roboto']">Маятниктің тербеліс периоды оның ұзындығына байланысты.</p>
+      <div class="experiment-controls flex justify-center space-x-6 flex-wrap gap-y-4 bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl">
+        <label class="text-white font-['Roboto']">Ұзындығы: <input id="pendulumLength" type="range" min="100" max="350" value="300" class="accent-blue-500"></label>
+        <label class="text-white font-['Roboto']">Бастапқы бұрышы: <input id="pendulumAngle" type="number" value="45" min="10" max="90" class="bg-slate-700 text-white rounded-md px-2 py-1"></label>
+        <button id="resetPendulum" class="group relative bg-blue-600 px-4 py-2 rounded-md text-white font-['Roboto'] font-semibold transition-all duration-500 hover:bg-blue-500 hover:shadow-[0_5px_15px_rgba(59,130,246,0.5)]">Іске қосу/Қайтару</button>
+      </div>
+      <div class="flex justify-center mt-6">
+        <canvas id="pendulumCanvas" width="800" height="400" class="experiment-canvas rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl"></canvas>
+      </div>
+    </div>
+    <!-- Telescope Experiment -->
+    <div class="mb-12">
+      <h3 class="text-2xl font-semibold mb-4 text-center text-blue-300 font-['Space_Mono']">Телескоптық бақылау</h3>
+      <p class="text-center mb-6 text-slate-200 font-['Roboto']">Жұлдыздарды үлкейту үшін курсорды апарыңыз.</p>
+      <div class="experiment-controls flex justify-center space-x-6 flex-wrap gap-y-4 bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl">
+        <label class="text-white font-['Roboto']">Жұлдыздар саны: <input id="starCount" type="number" value="50" min="10" max="200" class="bg-slate-700 text-white rounded-md px-2 py-1"></label>
+        <label class="text-white font-['Roboto']">Макс. масштаб: <input id="starScale" type="number" value="1.5" min="1.0" max="3.0" step="0.1" class="bg-slate-700 text-white rounded-md px-2 py-1"></label>
+        <button id="resetTelescope" class="group relative bg-blue-600 px-4 py-2 rounded-md text-white font-['Roboto'] font-semibold transition-all duration-500 hover:bg-blue-500 hover:shadow-[0_5px_15px_rgba(59,130,246,0.5)]">Іске қосу/Қайтару</button>
+      </div>
+      <div class="flex justify-center mt-6">
+        <canvas id="telescopeCanvas" width="800" height="400" class="experiment-canvas rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl"></canvas>
+      </div>
+    </div>
+    <!-- Jupiter Moons Experiment -->
+    <div class="mb-12">
+      <h3 class="text-2xl font-semibold mb-4 text-center text-blue-300 font-['Space_Mono']">Юпитердің серіктері</h3>
+      <p class="text-center mb-6 text-slate-200 font-['Roboto']">Юпитер серіктерінің орбиталық жылдамдығы.</p>
+      <div class="experiment-controls flex justify-center space-x-6 flex-wrap gap-y-4 bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl">
+        <label class="text-white font-['Roboto']">Жылдамдығы: <input id="moonSpeed" type="range" min="0.005" max="0.05" step="0.005" value="0.02" class="accent-blue-500"></label>
+        <label class="text-white font-['Roboto']">Серіктер саны: <input id="moonCount" type="number" value="4" min="1" max="6" class="bg-slate-700 text-white rounded-md px-2 py-1"></label>
+        <button id="resetJupiterMoons" class="group relative bg-blue-600 px-4 py-2 rounded-md text-white font-['Roboto'] font-semibold transition-all duration-500 hover:bg-blue-500 hover:shadow-[0_5px_15px_rgba(59,130,246,0.5)]">Іске қосу/Қайтару</button>
+      </div>
+      <div class="flex justify-center mt-6">
+        <canvas id="jupiterMoonsCanvas" width="800" height="400" class="experiment-canvas rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl"></canvas>
+      </div>
+    </div>
+  </div>
+  <!-- Background Decorative Element -->
+  <div class="absolute top-0 left-0 w-full h-full opacity-10 z-0">
+    <svg viewBox="0 0 100 100" class="w-full h-full">
+      <circle cx="50" cy="50" r="40" stroke="rgba(59,130,246,0.3)" stroke-width="1" fill="none"/>
+      <circle cx="20" cy="20" r="10" fill="rgba(59,130,246,0.2)"/>
+      <circle cx="80" cy="80" r="15" fill="rgba(59,130,246,0.2)"/>
+    </svg>
+  </div>
+</section>
 
   <!-- Quotes Section -->
-  <section id="quotes" class="py-16 bg-slate-900 animate-on-scroll fadeInUp">
-    <div class="container mx-auto px-4">
-      <h2 class="text-4xl font-bold mb-10 text-center text-white">Дәйексөздер</h2>
-      <div class="space-y-8">
-        <blockquote class="bg-slate-800 bg-opacity-80 p-8 rounded-lg shadow-xl italic border-l-8 border-blue-500 max-w-2xl mx-auto">
-          "Табиғат заңдары математикалық тілде жазылған."
-        </blockquote>
-        <blockquote class="bg-slate-800 bg-opacity-80 p-8 rounded-lg shadow-xl italic border-l-8 border-blue-500 max-w-2xl mx-auto">
-          "Біз білімсіздік мұхитындағы білім аралдарында өмір сүреміз."
-        </blockquote>
-        <blockquote class="bg-slate-800 bg-opacity-80 p-8 rounded-lg shadow-xl italic border-l-8 border-blue-500 max-w-2xl mx-auto">
-          "Сіз ештеңені үйрете алмайсыз; тек олардың ішінде жатқан нәрсені табуға көмектесе аласыз."
-        </blockquote>
+<section id="quotes" class="py-16 bg-slate-900 animate-on-scroll fadeInUp">
+  <div class="quotes-container">
+    <h2 class="text-4xl font-bold mb-12 text-center text-white">Дәйексөздер</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="quote-card">
+        <p>Табиғат заңдары математикалық тілде жазылған.</p>
+        <cite>— Галилео Галилей</cite>
+      </div>
+      <div class="quote-card">
+        <p>Біз білімсіздік мұхитындағы білім аралдарында өмір сүреміз.</p>
+        <cite>— Галилео Галилей</cite>
+      </div>
+      <div class="quote-card">
+        <p>Сіз ештеңені үйрете алмайсыз; тек олардың ішінде жатқан нәрсені табуға көмектесе аласыз.</p>
+        <cite>— Галилео Галилей</cite>
+      </div>
+      <div class="quote-card">
+        <p>Шындықты іздеу – ең ұлы шытырман оқиға.</p>
+        <cite>— Галилео Галилей</cite>
+      </div>
+      <div class="quote-card">
+        <p>Адамзаттың ең үлкен жетістігі – табиғатты түсіну.</p>
+        <cite>— Галилео Галилей</cite>
+      </div>
+      <div class="quote-card">
+        <p>Фактілермен дауласуға болмайды, өйткені олар шындық.</p>
+        <cite>— Галилео Галилей</cite>
+      </div>
+      <div class="quote-card">
+        <p>Мен өлшемсіз нәрсені өлшеуге тырыстым және өлшеуге болатын нәрсені таптым.</p>
+        <cite>— Галилео Галилей</cite>
+      </div>
+      <div class="quote-card">
+        <p>Жұлдыздарға қарап, шексіздікті сезіну – адам рухының шынайы қуанышы.</p>
+        <cite>— Галилео Галилей</cite>
+      </div>
+      <div class="quote-card">
+        <p>Ақыл мен сезім біріксе, шындықтың жолы ашылады.</p>
+        <cite>— Галилео Галилей</cite>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
   <!-- Contact Section -->
-  <section id="contact" class="py-16 bg-slate-800 animate-on-scroll fadeInUp">
-    <div class="container mx-auto px-4">
-      <h2 class="text-4xl font-bold mb-10 text-center">Байланыс</h2>
-      <div class="flex justify-center space-x-6">
-        <a href="https://www.biography.com/scientist/galileo" target="_blank" class="text-blue-400 hover:text-blue-300 transition btn-animated">Биография</a>
-        <a href="https://www.britannica.com/biography/Galileo-Galilei" target="_blank" class="text-blue-400 hover:text-blue-300 transition btn-animated">Britannica</a>
-        <a href="https://ru.wikipedia.org/wiki/%D0%93%D0%B0%D0%BB%D0%B8%D0%BB%D0%B5%D0%BE_%D0%93%D0%B0%D0%BB%D0%B8%D0%BB%D0%B5%D0%B9" target="_blank" class="text-blue-400 hover:text-blue-300 transition btn-animated">Уикипедия</a>
-      </div>
+<!-- Contact Section -->
+<section id="contact" class="py-20 bg-slate-800 animate-on-scroll fadeInUp relative overflow-hidden">
+  <!-- Contact Section -->
+<div class="container mx-auto px-6 relative z-10">
+  <h2 class="text-5xl font-bold mb-4 text-center text-white font-['Space_Mono'] relative">
+    <span class="relative z-10">Байланыс</span>
+    <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-transparent opacity-30 -z-10 blur-xl"></div>
+  </h2>
+  <div class="w-32 h-1 bg-gradient-to-r from-blue-500 to-blue-300 mx-auto mb-12 rounded-full"></div>
+    <div class="flex justify-center space-x-8 flex-wrap gap-y-6">
+      <!-- Biography Link -->
+      <a href="https://www.biography.com/scientist/galileo" target="_blank" class="group relative bg-[rgba(255,255,255,0.05)] backdrop-blur-lg px-6 py-3 rounded-lg border border-[rgba(255,255,255,0.1)] shadow-xl text-blue-300 font-['Roboto'] font-semibold transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.5)] hover:-translate-y-1">
+        <span class="relative z-10 flex items-center space-x-2">
+          <svg class="w-5 h-5 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253"></path></svg>
+          <span>Биография</span>
+        </span>
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
+      </a>
+      <!-- Britannica Link -->
+      <a href="https://www.britannica.com/biography/Galileo-Galilei" target="_blank" class="group relative bg-[rgba(255,255,255,0.05)] backdrop-blur-lg px-6 py-3 rounded-lg border border-[rgba(255,255,255,0.1)] shadow-xl text-blue-300 font-['Roboto'] font-semibold transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.5)] hover:-translate-y-1">
+        <span class="relative z-10 flex items-center space-x-2">
+          <svg class="w-5 h-5 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zm0 8c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z"></path></svg>
+          <span>Britannica</span>
+        </span>
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
+      </a>
+      <!-- Wikipedia Link -->
+      <a href="https://ru.wikipedia.org/wiki/%D0%93%D0%B0%D0%BB%D0%B8%D0%BB%D0%B5%D0%BE_%D0%93%D0%B0%D0%BB%D0%B8%D0%BB%D0%B5%D0%B9" target="_blank" class="group relative bg-[rgba(255,255,255,0.05)] backdrop-blur-lg px-6 py-3 rounded-lg border border-[rgba(255,255,255,0.1)] shadow-xl text-blue-300 font-['Roboto'] font-semibold transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.5)] hover:-translate-y-1">
+        <span class="relative z-10 flex items-center space-x-2">
+          <svg class="w-5 h-5 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M3 6h18M3 18h18"></path></svg>
+          <span>Уикипедия</span>
+        </span>
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
+      </a>
+      <!-- YouTube Shorts Link -->
+      <a href="https://youtube.com/shorts/GqYglZLz_Hw?feature=share" target="_blank" class="group relative bg-[rgba(255,255,255,0.05)] backdrop-blur-lg px-6 py-3 rounded-lg border border-[rgba(255,255,255,0.1)] shadow-xl text-blue-300 font-['Roboto'] font-semibold transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.5)] hover:-translate-y-1">
+        <span class="relative z-10 flex items-center space-x-2">
+          <svg class="w-5 h-5 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span>YouTube Shorts</span>
+        </span>
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
+      </a>
     </div>
-  </section>
+  </div>
+  <!-- Background Decorative Element -->
+  <div class="absolute top-0 left-0 w-full h-full opacity-10 z-0">
+    <svg viewBox="0 0 100 100" class="w-full h-full">
+      <circle cx="50" cy="50" r="40" stroke="rgba(59,130,246,0.3)" stroke-width="1" fill="none"/>
+      <circle cx="20" cy="20" r="10" fill="rgba(59,130,246,0.2)"/>
+      <circle cx="80" cy="80" r="15" fill="rgba(59,130,246,0.2)"/>
+    </svg>
+  </div>
+</section>
 
   <!-- YouTube Video Section -->
   <section id="video" class="py-16 bg-slate-900 animate-on-scroll fadeInUp">
@@ -916,7 +1270,7 @@
           <!-- Video 4 -->
           <div>
             <div class="youtube-video">
-              <iframe src="<iframe width="560" height="315" src="https://www.youtube.com/embed/MkoF4CCC63E?si=o4Eu_qxt0KdNsfjH" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              <iframe width="560" height="315" src="https://www.youtube.com/embed/MkoF4CCC63E?si=OHte3n_TOHZQ-do_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
             </div>
             <div class="video-description">
               <p class="text-lg">Галилейдің инквизициямен қақтығысы және оның ғылыми мұрасы туралы бейне.</p>
