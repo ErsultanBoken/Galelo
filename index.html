@@ -1,1709 +1,618 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        async function sendMessage() {
+        const input = document.getElementById("user-input");
+        const message = input.value.trim();
+        if (!message) return;
+
+        const chatBox = document.getElementById("chat-box");
+
+        // Добавляем сообщение пользователя
+        const userMessage = document.createElement("div");
+        userMessage.className = "chat-message user";
+        userMessage.innerHTML = `<div class="bubble"><strong>Сіз:</strong> ${message}</div>`;
+        chatBox.appendChild(userMessage);
+        chatBox.scrollTop = chatBox.scrollHeight; // Прокрутка вниз
+        input.value = "Ойлануда...";
+        input.disabled = true;
+
+        try {
+            const apiKey = "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"; // 🔒 Замените на свой API-ключ
+            const response = await fetch("https://api.openai.com/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${apiKey}`,
+                },
+                body: JSON.stringify({
+                    model: "gpt-4o",
+                    messages: [
+                        { role: "system", content: "Сен оқытуда жобалау әдісі бойынша қазақ тілінде көмек көрсететін көмекші ИИ-сің." },
+                        { role: "user", content: message }
+                    ],
+                    temperature: 0.7
+                })
+            });
+
+            if (!response.ok) throw new Error("API қатесі");
+
+            const data = await response.json();
+            const reply = data.choices[0].message.content;
+
+            // Добавляем ответ ИИ
+            const aiMessage = document.createElement("div");
+            aiMessage.className = "chat-message ai";
+            aiMessage.innerHTML = `<div class="bubble"><strong>ИИ:</strong> ${reply}</div>`;
+            chatBox.appendChild(aiMessage);
+            chatBox.scrollTop = chatBox.scrollHeight; // Прокрутка вниз
+        } catch (error) {
+            const errorMessage = document.createElement("div");
+            errorMessage.className = "chat-message ai";
+            errorMessage.innerHTML = `<div class="bubble"><strong>ИИ:</strong> Кешіріңіз, қате пайда болды: ${error.message}</div>`;
+            chatBox.appendChild(errorMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        input.value = "";
+        input.disabled = false;
+        input.focus();
+    }
+
+    // Отправка сообщения по нажатию Enter
+    document.getElementById("user-input").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            sendMessage();
+        }
+    });
+        </script>
+        
 <!DOCTYPE html>
 <html lang="kk">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Галилей коды</title>
-  <!-- TailwindCSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- Google Fonts: Open Sans, Space Mono, Roboto -->
-  <link rel="shortcut icon" href="1.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Space+Mono:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <!-- Lightbox -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
-  <style>
-    /* Reset and Base Styles */
-    html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
-      border: 0;
-      font-size: 100%;
-      font: inherit;
-      vertical-align: baseline;
-      margin: 0;
-      padding: 0;
-    }
-    article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
-      display: block;
-    }
-    body {
-      line-height: 1;
-      font-size: 10px;
-      font-family: 'Open Sans', sans-serif;
-      font-weight: 300;
-      background-color: #0f172a;
-    }
-    ol, ul { list-style: none; }
-    blockquote, q { quotes: none; }
-    blockquote:before, blockquote:after, q:before, q:after { content: none; }
-    table { border-collapse: collapse; border-spacing: 0; }
-    * { box-sizing: border-box; }
-
-    /* General Styles */
-    body {
-      background: linear-gradient(to bottom, #0f172a 0%, #1e3a8a 100%);
-      color: #e2e8f0;
-      font-family: 'Roboto', sans-serif;
-    }
-
-    h1, h2, h3 {
-      font-family: 'Space Mono', monospace;
-      color: #e2e8f0;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    /* Animations */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(40px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .fadeInUp { animation: fadeInUp 1s ease-out forwards; }
-    .animate-on-scroll { opacity: 0; }
-
-    /* Glassmorphism for Navigation */
-    nav {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-    }
-
-    /* Hero Section */
-    #home {
-      position: relative;
-      min-height: 100vh;
-      overflow: hidden;
-      background: radial-gradient(circle at center, rgba(30, 58, 138, 0.3) 0%, #0f172a 100%);
-    }
-
-    /* Starry Background */
-    .stars {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -2;
-    }
-
-    /* Cards */
-    .card {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Buttons */
-    .btn-animated {
-      transition: all 0.3s ease;
-    }
-    .btn-animated:hover {
-      transform: scale(1.05);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Planet Buttons */
-    .planet-buttons {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-      z-index: 10;
-    }
-    .planet-button {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #e2e8f0;
-      font-size: 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .planet-button:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-    }
-    .planet-button.active {
-      background: rgba(59, 130, 246, 0.5);
-      border-color: #3b82f6;
-      box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
-    }
-
-    /* Speed Info */
-    #speed-info {
-      position: absolute;
-      bottom: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 10px 20px;
-      border-radius: 10px;
-      color: #e2e8f0;
-      font-size: 18px;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: 10;
-    }
-    #speed-info.show {
-      opacity: 1;
-    }
-
-    /* Experiments */
-    .experiment-canvas {
-      border: 2px solid #64748b;
-      border-radius: 8px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Experiment Controls */
-    .experiment-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-    .experiment-controls label {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .experiment-controls input {
-      background: #1e293b;
-      color: #e2e8f0;
-      border: 1px solid #64748b;
-      padding: 0.5rem;
-      border-radius: 4px;
-    }
-    .experiment-controls button {
-      background: #3b82f6;
-      color: #ffffff;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      border: none;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    .experiment-controls button:hover {
-      background: #2563eb;
-    }
-
-    /* Gallery Styles */
-    .gallery-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 3rem 1rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
-      padding: 1rem;
-    }
-    .gallery-item {
-      position: relative;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .gallery-item:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
-    }
-    .gallery-item img {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.3s ease;
-    }
-    .gallery-item:hover img {
-      transform: scale(1.05);
-    }
-    .gallery-item figcaption {
-      padding: 1rem;
-      text-align: center;
-      font-size: 1rem;
-      color: #e2e8f0;
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(5px);
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    .gallery-item:hover figcaption {
-      opacity: 1;
-    }
-    .gallery-item::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: 1;
-    }
-    .gallery-item:hover::before {
-      opacity: 1;
-    }
-    @media (max-width: 768px) {
-      .gallery-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      }
-      .gallery-item img {
-        height: 180px;
-      }
-    }
-    @media (max-width: 480px) {
-      .gallery-grid {
-        grid-template-columns: 1fr;
-      }
-      .gallery-item img {
-        height: 200px;
-      }
-    }
-
-    /* YouTube Video Section */
-    .youtube-section {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
-    }
-    .youtube-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-    }
-    .youtube-video {
-      position: relative;
-      padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
-      height: 0;
-      overflow: hidden;
-      border-radius: 8px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-    .youtube-video iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-    .video-description {
-      margin-top: 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 1.5rem;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #e2e8f0;
-    }
-
-    /* Solar System Styles */
-    #universe {
-      z-index: -1;
-      position: absolute;
-      overflow: hidden;
-      width: 100%;
-      height: 100%;
-      background-position: center 40%;
-      background-repeat: no-repeat;
-      background-size: cover;
-    }
-    #galaxy {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-    #solar-system {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      transform-style: preserve-3d;
-    }
-    .orbit {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      transform-style: preserve-3d;
-      animation-name: orbit;
-      animation-iteration-count: infinite;
-      animation-timing-function: linear;
-    }
-    .orbit .orbit {
-      animation-name: suborbit;
-    }
-    .pos {
-      position: absolute;
-      top: 50%;
-      width: 2em;
-      height: 2em;
-      margin-top: -1em;
-      margin-left: -1em;
-      transform-style: preserve-3d;
-      animation-name: invert;
-      animation-iteration-count: infinite;
-      animation-timing-function: linear;
-    }
-    #sun, .planet, #earth .moon {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 1em;
-      height: 1em;
-      margin-top: -0.5em;
-      margin-left: -0.5em;
-      border-radius: 50%;
-      transform-style: preserve-3d;
-    }
-    #sun {
-      background: url('http://testrusunivers.ucoz.site/DESIGN/solarsystem/img/sun.png') no-repeat center/cover;
-      box-shadow: 0 0 60px rgba(255, 160, 60, 0.4);
-    }
-    .planet {
-      background: #202020 no-repeat center/cover;
-      animation-iteration-count: infinite;
-      animation-timing-function: linear;
-    }
-    .ring {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      border-radius: 50%;
-    }
-    #saturn .ring {
-      width: 2em;
-      height: 2em;
-      margin-top: -1em;
-      margin-left: -1em;
-      border: 0.3em solid rgba(160, 147, 130, 0.7);
-      animation-iteration-count: infinite;
-      animation-timing-function: linear;
-    }
-    #saturn .ring:after {
-      border-radius: 50%;
-      position: absolute;
-      content: '';
-      top: 50%;
-      left: 50%;
-      width: 2.2em;
-      height: 2.2em;
-      margin-top: -1.1em;
-      margin-left: -1.1em;
-      border: 0.07em solid rgba(160, 147, 130, 0.5);
-      box-sizing: border-box;
-    }
-    #mercury { z-index: 10; }
-    #venus { z-index: 9; }
-    #earth { z-index: 8; }
-    #moon { z-index: 7; }
-    #mars { z-index: 6; }
-    #jupiter { z-index: 5; }
-    #saturn { z-index: 4; }
-    #uranus { z-index: 3; }
-    #neptune { z-index: 2; }
-    #sun { z-index: 1; }
-    @keyframes orbit {
-      0% { transform: rotateZ(0deg); }
-      100% { transform: rotateZ(-360deg); }
-    }
-    @keyframes suborbit {
-      0% { transform: rotateX(90deg) rotateZ(0deg); }
-      100% { transform: rotateX(90deg) rotateZ(-360deg); }
-    }
-    @keyframes invert {
-      0% { transform: rotateX(-90deg) rotateY(360deg) rotateZ(0deg); }
-      100% { transform: rotateX(-90deg) rotateY(0deg) rotateZ(0deg); }
-    }
-    .view-3D.zoom-large #sun { transform-style: preserve-3d; }
-    .view-3D.zoom-large .orbit { transform-style: preserve-3d; }
-    .view-3D #solar-system { transform: rotateX(75deg); }
-    .view-3D #sun { transform: rotateX(-90deg); }
-    .view-3D .ring { transform: rotateX(90deg); }
-    .view-3D .planet, .view-3D .moon { transform: rotateX(0deg); }
-    .zoom-large #solar-system { width: 100%; }
-    .zoom-large.view-3D .scale-stretched #solar-system { font-size: 62%; }
-    #mercury .pos, #mercury .planet, #mercury.orbit { animation-duration: 2.89016s; }
-    #venus .pos, #venus .planet, #venus.orbit { animation-duration: 7.38237s; }
-    #earth .pos, #earth .planet, #earth.orbit { animation-duration: 12.00021s; }
-    #earth .orbit .pos, #earth .orbit { animation-duration: 0.89764s; }
-    #mars .pos, #mars .planet, #mars.orbit { animation-duration: 22.57017s; }
-    #jupiter .pos, #jupiter .planet, #jupiter.orbit { animation-duration: 142.35138s; }
-    #saturn .pos, #saturn .planet, #saturn.orbit, #saturn .ring { animation-duration: 353.36998s; }
-    #uranus .pos, #uranus .planet, #uranus.orbit { animation-duration: 1008.20215s; }
-    #neptune .pos, #neptune .planet, #neptune.orbit { animation-duration: 1977.49584s; }
-    .scale-stretched #sun { font-size: 24em; }
-    .scale-stretched #mercury .planet { font-size: 1.5em; }
-    .scale-stretched #venus .planet { font-size: 3.72em; }
-    .scale-stretched #earth .planet { font-size: 3.92em; }
-    .scale-stretched #earth .moon { font-size: 1.2em; }
-    .scale-stretched #mars .planet { font-size: 2.9em; }
-    .scale-stretched #jupiter .planet { font-size: 12em; }
-    .scale-stretched #saturn .planet { font-size: 10.8em; }
-    .scale-stretched #uranus .planet { font-size: 4.68em; }
-    .scale-stretched #neptune .planet { font-size: 4.9em; }
-    .scale-stretched #mercury.orbit {
-      width: 32em; height: 32em; margin-top: -16em; margin-left: -16em;
-    }
-    .scale-stretched #venus.orbit {
-      width: 40em; height: 40em; margin-top: -20em; margin-left: -20em;
-    }
-    .scale-stretched #earth.orbit {
-      width: 56em; height: 56em; margin-top: -28em; margin-left: -28em;
-    }
-    .scale-stretched #earth .orbit {
-      width: 6em; height: 6em; margin-top: -3em; margin-left: -3em;
-    }
-    .scale-stretched #mars.orbit {
-      width: 72em; height: 72em; margin-top: -36em; margin-left: -36em;
-    }
-    .scale-stretched #jupiter.orbit {
-      width: 100em; height: 100em; margin-top: -50em; margin-left: -50em;
-    }
-    .scale-stretched #saturn.orbit {
-      width: 150em; height: 150em; margin-top: -75em; margin-left: -75em;
-    }
-    .scale-stretched #uranus.orbit {
-      width: 186em; height: 186em; margin-top: -93em; margin-left: -93em;
-    }
-    .scale-stretched #neptune.orbit {
-      width: 210em; height: 210em; margin-top: -105em; margin-left: -105em;
-    }
-    #mercury .pos { left: 50%; top: -1%; }
-    #mercury .planet { animation-name: shadow-mercury; }
-    @keyframes shadow-mercury {
-      0% { box-shadow: inset 0 0 1px rgba(0,0,0,0.5); }
-      25% { box-shadow: inset 4px 0 2px rgba(0,0,0,0.5); }
-      50% { box-shadow: inset 13px -5px 4px rgba(0,0,0,0.5); }
-      50.01% { box-shadow: inset -13px -5px 4px rgba(0,0,0,0.5); }
-      75% { box-shadow: inset -4px 0 2px rgba(0,0,0,0.5); }
-      100% { box-shadow: inset 0 0 1px rgba(0,0,0,0.5); }
-    }
-    #venus .pos { left: 0; top: 50%; }
-    #venus .planet { animation-name: shadow-venus; }
-    @keyframes shadow-venus {
-      0% { box-shadow: inset 4px 0 2px rgba(0,0,0,0.5); }
-      25% { box-shadow: inset 22px -20px 10px rgba(0,0,0,0.5); }
-      25.5% { box-shadow: inset -22px -20px 10px rgba(0,0,0,0.5); }
-      50% { box-shadow: inset -4px 0 2px rgba(0,0,0,0.5); }
-      75% { box-shadow: inset 0 0 1px rgba(0,0,0,0.5); }
-      100% { box-shadow: inset 4px 0 2px rgba(0,0,0,0.5); }
-    }
-    #earth .pos { left: 100%; top: 50%; }
-    #earth .planet { animation-name: shadow-earth; }
-    @keyframes shadow-earth {
-      0% { box-shadow: inset -4px 0 2px rgba(0,0,0,0.5); }
-      25% { box-shadow: inset 0 0 1px rgba(0,0,0,0.5); }
-      50% { box-shadow: inset 4px 0 2px rgba(0,0,0,0.5); }
-      75% { box-shadow: inset 24px -20px 15px rgba(0,0,0,0.5); }
-      75.01% { box-shadow: inset -24px -20px 15px rgba(0,0,0,0.5); }
-      100% { box-shadow: inset -4px 0 2px rgba(0,0,0,0.5); }
-    }
-    #earth .orbit .pos { left: 100%; top: 50%; }
-    #mars .pos { left: 50%; top: 100%; }
-    #mars .planet { animation-name: shadow-mars; }
-    @keyframes shadow-mars {
-      0% { box-shadow: inset -18px -10px 10px rgba(0,0,0,0.5); }
-      25% { box-shadow: inset -4px 0 2px rgba(0,0,0,0.5); }
-      50% { box-shadow: inset 0 1px 1px rgba(0,0,0,0.5); }
-      75% { box-shadow: inset 4px 0 2px rgba(0,0,0,0.5); }
-      99.99% { box-shadow: inset 18px -10px 10px rgba(0,0,0,0.5); }
-      100% { box-shadow: inset -18px -10px 10px rgba(0,0,0,0.5); }
-    }
-    #jupiter .pos { left: 100%; top: 50%; }
-    #jupiter .planet { animation-name: shadow-jupiter; }
-    @keyframes shadow-jupiter {
-      0% { box-shadow: inset -16px 0 5px rgba(0,0,0,0.5); }
-      25% { box-shadow: inset 0 3px 2px rgba(0,0,0,0.5); }
-      50% { box-shadow: inset 16px 0 5px rgba(0,0,0,0.5); }
-      75% { box-shadow: inset 94px -30px 40px rgba(0,0,0,0.5); }
-      75.01% { box-shadow: inset -94px -30px 40px rgba(0,0,0,0.5); }
-      100% { box-shadow: inset -16px 0 5px rgba(0,0,0,0.5); }
-    }
-    #saturn .pos { left: 0%; top: 50%; }
-    #saturn .planet { animation-name: shadow-saturn; }
-    @keyframes shadow-saturn {
-      0% { box-shadow: inset 16px 0 5px rgba(0,0,0,0.5); }
-      25% { box-shadow: inset 80px -30px 50px rgba(0,0,0,0.5); }
-      25.01% { box-shadow: inset -94px -30px 40px rgba(0,0,0,0.5); }
-      50% { box-shadow: inset -16px 0 5px rgba(0,0,0,0.5); }
-      75% { box-shadow: inset -2px 3px 2px rgba(0,0,0,0.5); }
-      100% { box-shadow: inset 16px 0 5px rgba(0,0,0,0.5); }
-    }
-    #uranus .pos { left: 0; top: 50%; }
-    #uranus .planet { animation-name: shadow-uranus; }
-    @keyframes shadow-uranus {
-      0% { box Thibault-shadow: inset 8px 0 5px rgba(0,0,0,0.5); }
-      25% { box-shadow: inset 40px -15px 40px rgba(0,0,0,0.5); }
-      25.01% { box-shadow: inset -40px -15px 40px rgba(0,0,0,0.5); }
-      50% { box-shadow: inset -8px 0 5px rgba(0,0,0,0.5); }
-      75% { box-shadow: inset 0 0 2px rgba(0,0,0,0.5); }
-      100% { box-shadow: inset 8px 0 5px rgba(0,0,0,0.5); }
-    }
-    #neptune .pos { left: 50%; top: 0; }
-    #neptune .planet { animation-name: shadow-neptune; }
-    @keyframes shadow-neptune {
-      0% { box-shadow: inset 0 0 2px rgba(0,0,0,0.5); }
-      25% { box-shadow: inset 12px 0 5px rgba(0,0,0,0.5); }
-      50% { box-shadow: inset 50px -15px 40px rgba(0,0,0,0.5); }
-      50.01% { box-shadow: inset -50px -15px 40px rgba(0,0,0,0.5); }
-      75% { box-shadow: inset -12px 0 5px rgba(0,0,0,0.5); }
-      100% { box-shadow: inset 0 0 2px rgba(0,0,0,0.5); }
-    }
-    .quotes-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 3rem 1rem;
-    }
-    .quote-card {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 2rem;
-      border-radius: 12px;
-      text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    .quote-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    }
-    .quote-card::before {
-      content: '“';
-      position: absolute;
-      top: 10px;
-      left: 20px;
-      font-size: 4rem;
-      color: rgba(59, 130, 246, 0.3);
-      z-index: 0;
-    }
-    .quote-card p {
-      font-size: 1.5rem;
-      font-style: italic;
-      color: #e2e8f0;
-      position: relative;
-      z-index: 1;
-    }
-    .quote-card cite {
-      display: block;
-      margin-top: 1rem;
-      font-size: 1.2rem;
-      color: #94a3b8;
-    }
-    @media (max-width: 768px) {
-      .quote-card p {
-        font-size: 1.2rem;
-      }
-      .quote-card cite {
-        font-size: 1rem;
-      }
-    }
-    #mercury .planet { background-image: url('http://testrusunivers.ucoz.site/DESIGN/solarsystem/img/mercury.png'); }
-    #venus .planet { background-image: url('http://testrusunivers.ucoz.site/DESIGN/solarsystem/img/venus.png'); }
-    #earth .planet { background-image: url('http://testrusunivers.ucoz.site/DESIGN/solarsystem/img/earth.png'); }
-    #earth .moon { background-color: white; }
-    #mars .planet { background-image: url('http://testrusunivers.ucoz.site/DESIGN/solarsystem/img/mars.png'); }
-    #jupiter .planet { background-image: url('http://testrusunivers.ucoz.site/DESIGN/solarsystem/img/jupiter.png'); }
-    #saturn .planet { background-image: url('http://testrusunivers.ucoz.site/DESIGN/solarsystem/img/saturn.png'); }
-    #uranus .planet { background-image: url('http://testrusunivers.ucoz.site/DESIGN/solarsystem/img/uranus.png'); }
-    #neptune .planet { background-image: url('http://testrusunivers.ucoz.site/DESIGN/solarsystem/img/neptune.png'); }
-    @media screen and (max-width: 299px) { #universe { font-size: 20%; } }
-    @media screen and (min-width: 300px) { #universe { font-size: 24%; } }
-    @media screen and (min-width: 500px) { #universe { font-size: 36%; } }
-    @media screen and (min-width: 600px) { #universe { font-size: 44%; } }
-    @media screen and (min-width: 760px) { #universe { font-size: 58%; } }
-    @media screen and (min-width: 1000px) { #universe { font-size: 73%; } }
-    @media screen and (min-width: 1300px) { #universe { font-size: 100%; } }
-  </style>
-</head>
-<body class="set-speed zoom-large view-3D">
-  <!-- Navigation -->
-  <nav class="fixed w-full z-20">
-    <div class="max-w-screen-xl mx-auto px-4 py-4 flex justify-between items-center">
-      <div class="flex items-center">
-        <img src="1.png" alt="Логотип" class="h-12 mr-4" loading="lazy" onerror="this.src='https://via.placeholder.com/50?text=Logo'">
-        <span class="text-3xl font-bold text-white">Галилей коды</span>
-      </div>
-      <button id="menu-toggle" class="md:hidden focus:outline-none">
-        <svg class="w-8 h-8 fill-current text-white" viewBox="0 0 24 24">
-          <path d="M4 5h16M4 12h16M4 19h16" />
-        </svg>
-      </button>
-      <div id="menu" class="hidden md:flex flex-col md:flex-row md:space-x-8 w-full md:w-auto md:items-center text-lg mt-4 md:mt-0">
-        <a href="#home" class="block px-4 py-2 hover:text-blue-300 transition btn-animated text-white">Басты бет</a>
-        <a href="#about" class="block px-4 py-2 hover:text-blue-300 transition btn-animated text-white">Галилей туралы</a>
-        <a href="#discoveries" class="block px-4 py-2 hover:text-blue-300 transition btn-animated text-white">Ашылымдар</a>
-        <a href="#gallery" class="block px-4 py-2 hover:text-blue-300 transition btn-animated text-white">Галерея</a>
-        <a href="#experiments" class="block px-4 py-2 hover:text-blue-300 transition btn-animated text-white">Эксперименттер</a>
-        <a href="#quotes" class="block px-4 py-2 hover:text-blue-300 transition btn-animated text-white">Дәйексөздер</a>
-        <a href="#contact" class="block px-4 py-2 hover:text-blue-300 transition btn-animated text-white">Байланыс</a>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Hero Section -->
-  <section id="home" class="pt-24 pb-20 animate-on-scroll fadeInUp relative">
-    <canvas class="stars"></canvas>
-    <div id="universe" class="scale-stretched set-speed">
-      <div id="galaxy">
-        <div id="solar-system" class="earth">
-          <div id="mercury" class="orbit"><div class="pos"><div class="planet"></div></div></div>
-          <div id="venus" class="orbit"><div class="pos"><div class="planet"></div></div></div>
-          <div id="earth" class="orbit">
-            <div class="pos">
-              <div class="orbit"><div class="pos"><div class="moon"></div></div></div>
-              <div class="planet"></div>
-            </div>
-          </div>
-          <div id="mars" class="orbit"><div class="pos"><div class="planet"></div></div></div>
-          <div id="jupiter" class="orbit"><div class="pos"><div class="planet"></div></div></div>
-          <div id="saturn" class="orbit"><div class="pos"><div class="planet"><div class="ring"></div></div></div></div>
-          <div id="uranus" class="orbit"><div class="pos"><div class="planet"></div></div></div>
-          <div id="neptune" class="orbit"><div class="pos"><div class="planet"></div></div></div>
-          <div id="sun"></div>
-        </div>
-      </div>
-    </div>
-    <div class="container mx-auto px-4 text-center text-white relative z-10">
-      <h1 class="text-5xl md:text-7xl font-bold mb-6">Галилео Галилей</h1>
-      <p class="text-2xl md:text-3xl mb-8">Астрономия мен ғылымның пионері</p>
-      <p class="text-lg md:text-xl mb-10 max-w-3xl mx-auto">
-        <em>"E pur si muove!"</em> — «Бірақ ол әлі қозғалады!»
-      </p>
-      <a href="#about" class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-lg text-xl font-semibold btn-animated">
-        Көбірек білу
-      </a>
-    </div>
-    <div id="speed-info"></div>
-    <div class="planet-buttons">
-      <button class="planet-button" data-planet="sun" data-speed="0 км/ч">Солнце</button>
-      <button class="planet-button" data-planet="mercury" data-speed="170,503 км/ч">Меркурий</button>
-      <button class="planet-button" data-planet="venus" data-speed="126,074 км/ч">Венера</button>
-      <button class="planet-button" data-planet="earth" data-speed="107,218 км/ч">Земля</button>
-      <button class="planet-button" data-planet="mars" data-speed="86,677 км/ч">Марс</button>
-      <button class="planet-button" data-planet="jupiter" data-speed="47,002 км/ч">Юпитер</button>
-      <button class="planet-button" data-planet="saturn" data-speed="34,701 км/ч">Сатурн</button>
-      <button class="planet-button" data-planet="uranus" data-speed="24,477 км/ч">Уран</button>
-      <button class="planet-button" data-planet="neptune" data-speed="19,566 км/ч">Нептун</button>
-    </div>
-  </section>
-
-<!-- About Section -->
-<section id="about" class="py-20 bg-slate-800 animate-on-scroll fadeInUp relative overflow-hidden">
-  <div class="container mx-auto px-6 relative z-10">
-    <h2 class="text-5xl font-bold mb-4 text-center text-white font-['Space_Mono']">Галилей туралы</h2>
-    <div class="w-32 h-1 bg-blue-400 mx-auto mb-12 rounded-full"></div>
-    <div class="flex flex-col md:flex-row items-start gap-12">
-      <!-- Image Block -->
-      <div class="w-full md:w-2/5 flex justify-center md:justify-start">
-        <div class="relative group">
-          <img src="11.png" alt="Галилео Галилей" class="w-96 h-auto rounded-xl shadow-2xl transition-transform duration-500 group-hover:scale-105 group-hover:shadow-[0_0_30px_rgba(59,130,246,0.5)]" loading="lazy" onerror="this.src='https://via.placeholder.com/400?text=Galileo+Portrait'">
-          <div class="absolute inset-0 rounded-xl bg-gradient-to-t from-slate-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <!-- Decorative Frame -->
-          <div class="absolute inset-0 rounded-xl border-2 border-[rgba(59,130,246,0.3)] opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
-        </div>
-      </div>
-      <!-- Text -->
-      <div class="w-full md:w-2/3">
-        <div class="bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-8 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl">
-          <p class="text-lg leading-relaxed mb-6 text-slate-200 font-['Roboto']">
-            <span class="text-blue-400 font-semibold">Галилео Галилей</span> (15 ақпан 1564 – 8 қаңтар 1642) — итальяндық астроном, физик, математик және философ, қазіргі ғылымның негізін қалаушылардың бірі. Пизаның жанындағы Арчетриде дүниеге келген ол Падуя университетінде білім алды. Галилей телескопты жетілдіріп, <span class="italic">Юпитердің төрт серігін</span> (қазір Галилей серіктері деп аталады) ашты, Айдың бетін, Күннің дақтарын және Венераның фазаларын бақылады. Бұл ашылымдар Коперниктің гелиоцентрлік теориясын растады.
-          </p>
-          <p class="text-lg leading-relaxed mb-6 text-slate-200 font-['Roboto']">
-            Галилейдің <span class="text-blue-400 font-semibold">қозғалыс заңдары</span> классикалық механиканың негізін қалады. Ол еркін түсу эксперименттері арқылы барлық денелер бірдей үдеумен құлайтынын дәлелдеді. Маятникті зерттеуі уақытты дәл өлшеуге мүмкіндік берді, бұл кейін сағат жасауда қолданылды. Сонымен қатар, ол пропорционалдық циркуль және басқа да инновациялық өлшеу құралдарын ойлап тапты.
-          </p>
-          <p class="text-lg leading-relaxed text-slate-200 font-['Roboto']">
-            Гелиоцентризмді қолдағаны үшін Галилей католиктік шіркеумен қақтығысқа түсті. 1633 жылы инквизиция оны Коперниктің ілімінен бас тартуға мәжбүр етті және өмірінің соңына дейін үй қамауында ұстады. Дегенмен, оның идеялары ғылымның дамуына орасан зор әсер етті, және ол <span class="text-blue-400 font-semibold">қазіргі ғылыми әдістің пионері</span> ретінде мәңгі есте қалды.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Background Decorative Element -->
-  <div class="absolute top-0 left-0 w-full h-full opacity-10 z-0">
-    <svg viewBox="0 0 100 100" class="w-full h-full">
-      <circle cx="50" cy="50" r="40" stroke="rgba(59,130,246,0.3)" stroke-width="1" fill="none"/>
-      <circle cx="20" cy="20" r="10" fill="rgba(59,130,246,0.2)"/>
-      <circle cx="80" cy="80" r="15" fill="rgba(59,130,246,0.2)"/>
-    </svg>
-  </div>
-</section>
-  <section id="discoveries" class="py-20 bg-slate-900 animate-on-scroll fadeInUp relative overflow-hidden">
-    <div class="container mx-auto px-6 relative z-10">
-      <h2 class="text-5xl font-bold mb-4 text-center text-white font-['Space_Mono']">Ашылымдар</h2>
-      <div class="w-32 h-1 bg-gradient-to-r from-blue-500 to-blue-300 mx-auto mb-12 rounded-full"></div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Card 1 -->
-        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Телескоп</h3>
-          <p class="text-slate-200 font-['Roboto'] relative z-10">1609 жылы Галилео телескопты жетілдіріп, Айдың кратерлерін, Күн дақтарын және Венераның фазаларын бақылады.</p>
-        </div>
-        <!-- Card 2 -->
-        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Қозғалыс заңдары</h3>
-          <p class="text-slate-200 font-['Roboto'] relative z-10">Денелер салмағына қарамастан бірдей үдеумен құлайтынын дәлелдеді, бұл механиканың негізі болды.</p>
-        </div>
-        <!-- Card 3 -->
-        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Юпитердің серіктері</h3>
-          <p class="text-slate-200 font-['Roboto'] relative z-10">1610 жылы төрт серік (Ио, Европа, Ганимед, Каллисто) ашып, гелиоцентризмді растады.</p>
-        </div>
-        <!-- Card 4 -->
-        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Инквизиция</h3>
-          <p class="text-slate-200 font-['Roboto'] relative z-10">Гелиоцентризмді қолдағаны үшін 1633 жылы сотталып, үй қамауында болды.</p>
-        </div>
-        <!-- Card 5 -->
-        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Маятник</h3>
-          <p class="text-slate-200 font-['Roboto'] relative z-10">Маятникті зерттеу арқылы уақытты дәл өлшеудің әдісін ашты, сағат жасауға әсер етті.</p>
-        </div>
-        <!-- Card 6 -->
-        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Гелиоцентризм</h3>
-          <p class="text-slate-200 font-['Roboto'] relative z-10">Коперниктің гелиоцентрлік теориясын қолдап, Жердің Күнді айналатынын дәлелдеді.</p>
-        </div>
-        <!-- Card 7 -->
-        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Пропорционалдық циркуль</h3>
-          <p class="text-slate-200 font-['Roboto'] relative z-10">Математикалық есептеулерді жеңілдететін пропорционалдық циркуль ойлап тапты.</p>
-        </div>
-        <!-- Card 8 -->
-        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Күн дақтары</h3>
-          <p class="text-slate-200 font-['Roboto'] relative z-10">Күннің дақтарын бақылап, Күннің өз осінен айналатынын анықтады.</p>
-        </div>
-        <!-- Card 9 -->
-        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Термометр</h3>
-          <p class="text-slate-200 font-['Roboto'] relative z-10">Температураны өлшеуге арналған алғашқы термометрдің прототипін жасады.</p>
-        </div>
-        <!-- Card 10 -->
-        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Микроскоп</h3>
-          <p class="text-slate-200 font-['Roboto'] relative z-10">Оптикалық құралдарды жетілдіріп, микроскоптың алғашқы нұсқасын құрастырды.</p>
-        </div>
-        <!-- Card 11 -->
-        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Математика</h3>
-          <p class="text-slate-200 font-['Roboto'] relative z-10">Табиғат заңдарын математикалық тілде сипаттаудың маңыздылығын дәлелдеді.</p>
-        </div>
-        <!-- Card 12 -->
-        <div class="card bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.3)] hover:-translate-y-2 relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <h3 class="text-2xl font-semibold mb-3 text-blue-300 font-['Space_Mono'] relative z-10">Айдың кратерлері</h3>
-          <p class="text-slate-200 font-['Roboto'] relative z-10">Айдың бетіндегі кратерлерді алғаш рет бақылап, оның тегіс емес екенін көрсетті.</p>
-        </div>
-      </div>
-    </div>
-    <!-- Background Decorative Element -->
-    <div class="absolute top-0 left-0 w-full h-full opacity-10 z-0">
-      <svg viewBox="0 0 100 100" class="w-full h-full">
-        <circle cx="50" cy="50" r="40" stroke="rgba(59,130,246,0.3)" stroke-width="1" fill="none"/>
-        <circle cx="20" cy="20" r="10" fill="rgba(59,130,246,0.2)"/>
-        <circle cx="80" cy="80" r="15" fill="rgba(59,130,246,0.2)"/>
-      </svg>
-    </div>
-  </section>
-
-  <!-- Enhanced Gallery Section -->
-  <section id="gallery" class="py-16 bg-slate-900 animate-on-scroll fadeInUp">
-    <div class="gallery-container">
-      <h2 class="text-4xl font-bold mb-12 text-center text-white">Галерея</h2>
-      <div class="gallery-grid">
-        <figure class="gallery-item" data-src="2.png" data-caption="Галилея телескопы, 1609">
-          <img src="2.png" alt="Галилея телескопы" class="rounded-lg w-full object-cover">
-          <figcaption>Галилея телескопы, 1609</figcaption>
-        </figure>
-        <figure class="gallery-item" data-src="3.png" data-caption="Гидростатикалық таразы">
-          <img src="3.png" alt="Гидростатикалық таразы" class="rounded-lg w-full object-cover">
-          <figcaption>Гидростатикалық таразы</figcaption>
-        </figure>
-        <figure class="gallery-item" data-src="4.png" data-caption="Галелео термометірі">
-          <img src="4.png" alt="Галелео термометірі" class="rounded-lg w-full object-cover">
-          <figcaption>Галелео термометірі</figcaption>
-        </figure>
-        <figure class="gallery-item" data-src="5.png" data-caption="Микроскоп Галилея">
-          <img src="5.png" alt="Микроскоп Галилея" class="rounded-lg w-full object-cover">
-          <figcaption>Микроскоп Галилея</figcaption>
-        </figure>
-        <figure class="gallery-item" data-src="6.jpg" data-caption="Галелео целатоны">
-          <img src="6.jpg" alt="Галелео целатоны" class="rounded-lg w-full object-cover">
-          <figcaption>Галелео целатоны</figcaption>
-        </figure>
-        <figure class="gallery-item" data-src="7.jpg" data-caption="Микрометр Галелео">
-          <img src="7.jpg" alt="Микрометр Галелео" class="rounded-lg w-full object-cover">
-          <figcaption>Микрометр Галелео</figcaption>
-        </figure>
-        <figure class="gallery-item" data-src="8.jpg" data-caption="Пропорционалдық циркуль">
-          <img src="8.jpg" alt="Пропорционалдық циркуль" class="rounded-lg w-full object-cover">
-          <figcaption>Пропорционалдық циркуль</figcaption>
-        </figure>
-        <figure class="gallery-item" data-src="9.jpg" data-caption="Галелео целатоны">
-          <img src="9.jpg" alt="Галелео целатоны" class="rounded-lg w-full object-cover">
-          <figcaption>Галелео целатоны</figcaption>
-        </figure>
-        <figure class="gallery-item" data-src="10.jpg" data-caption="Галелео сағат механизмі">
-          <img src="10.jpg" alt="Галелео сағат механизмі" class="rounded-lg w-full object-cover">
-          <figcaption>Галелео сағат механизмі</figcaption>
-        </figure>
-        <figure class="gallery-item" data-src="2.png" data-caption="Галелео телескопы(Музей моделі)">
-          <img src="2.png" alt="Галелео телескопы" class="rounded-lg w-full object-cover">
-          <figcaption>Галелео телескопы(Музей моделі)</figcaption>
-        </figure>
-      </div>
-    </div>
-    <!-- Image Modal -->
-    <div class="image-modal" id="imageModal">
-      <button class="close-btn">Жабу</button>
-      <img src="" alt="Full-screen image">
-      <figcaption></figcaption>
-    </div>
-  </section>
-
-  <!-- CSS Styles (добавить в <style> тег или отдельный CSS файл) -->
-  <style>
-    /* Gallery Styles */
-    .gallery-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 3rem 1rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
-      padding: 1rem;
-    }
-    .gallery-item {
-      position: relative;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      cursor: pointer;
-    }
-    .gallery-item:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
-    }
-    .gallery-item img {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.3s ease;
-    }
-    .gallery-item:hover img {
-      transform: scale(1.05);
-    }
-    .gallery-item figcaption {
-      padding: 1rem;
-      text-align: center;
-      font-size: 1rem;
-      color: #e2e8f0;
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(5px);
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    .gallery-item:hover figcaption {
-      opacity: 1;
-    }
-    .gallery-item::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      z-index: 1;
-    }
-    .gallery-item:hover::before {
-      opacity: 1;
-    }
-    @media (max-width: 768px) {
-      .gallery-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      }
-      .gallery-item img {
-        height: 180px;
-      }
-    }
-    @media (max-width: 480px) {
-      .gallery-grid {
-        grid-template-columns: 1fr;
-      }
-      .gallery-item img {
-        height: 200px;
-      }
-    }
-
-    /* Full-screen Image Modal */
-    .image-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-    .image-modal img {
-      max-width: 90%;
-      max-height: 80%;
-      object-fit: contain;
-      border-radius: 8px;
-    }
-    .image-modal figcaption {
-      color: #e2e8f0;
-      font-size: 1.5rem;
-      margin-top: 1rem;
-      text-align: center;
-    }
-    .image-modal .close-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: #3b82f6;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    .image-modal .close-btn:hover {
-      background: #2563eb;
-    }
-  </style>
-
-  <!-- JavaScript (добавить в <script> тег или отдельный JS файл) -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const galleryItems = document.querySelectorAll(".gallery-item");
-      const modal = document.getElementById("imageModal");
-      const modalImg = modal.querySelector("img");
-      const modalCaption = modal.querySelector("figcaption");
-      const closeBtn = modal.querySelector(".close-btn");
-
-      galleryItems.forEach(item => {
-        item.addEventListener("click", () => {
-          modalImg.src = item.dataset.src;
-          modalCaption.textContent = item.dataset.caption;
-          modal.style.display = "flex";
-        });
-      });
-
-      closeBtn.addEventListener("click", () => {
-        modal.style.display = "none";
-      });
-
-      modal.addEventListener("click", (e) => {
-        if (e.target === modal) {
-          modal.style.display = "none";
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оқытуда жобалау әдісі</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
         }
-      });
-    });
-  </script>
-
-<!-- Experiments Section -->
-<section id="experiments" class="py-20 bg-slate-900 animate-on-scroll fadeInUp relative overflow-hidden">
-  <div class="container mx-auto px-6 relative z-10">
-    <h2 class="text-5xl font-bold mb-4 text-center text-white font-['Space_Mono'] relative">
-      <span class="relative z-10">Эксперименттер</span>
-      <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-transparent opacity-30 -z-10 blur-xl"></div>
-    </h2>
-    <div class="w-32 h-1 bg-gradient-to-r from-blue-500 to-blue-300 mx-auto mb-12 rounded-full"></div>
-    <!-- Falling Bodies Experiment -->
-    <div class="mb-12">
-      <h3 class="text-2xl font-semibold mb-4 text-center text-blue-300 font-['Space_Mono']">Құлайтын денелер</h3>
-      <p class="text-center mb-6 text-slate-200 font-['Roboto']">Галилей заңы: денелердің салмағына қарамастан бірдей үдеумен құлайтыны.</p>
-      <div class="experiment-controls flex justify-center space-x-6 flex-wrap gap-y-4 bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl">
-        <label class="text-white font-['Roboto']">1-ші шардың массасы: <input id="mass1" type="number" value="20" min="10" max="50" class="bg-slate-700 text-white rounded-md px-2 py-1"></label>
-        <label class="text-white font-['Roboto']">2-ші шардың массасы: <input id="mass2" type="number" value="10" min="10" max="50" class="bg-slate-700 text-white rounded-md px-2 py-1"></label>
-        <label class="text-white font-['Roboto']">Гравитация: <input id="gravity" type="number" value="0.4" min="0.1" max="1.0" step="0.1" class="bg-slate-700 text-white rounded-md px-2 py-1"></label>
-        <button id="resetFallingBodies" class="group relative bg-blue-600 px-4 py-2 rounded-md text-white font-['Roboto'] font-semibold transition-all duration-500 hover:bg-blue-500 hover:shadow-[0_5px_15px_rgba(59,130,246,0.5)]">Іске қосу/Қайтару</button>
-      </div>
-      <div class="flex justify-center mt-6">
-        <canvas id="fallingBodiesCanvas" width="800" height="400" class="experiment-canvas rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl"></canvas>
-      </div>
-    </div>
-    <!-- Pendulum Experiment -->
-    <div class="mb-12">
-      <h3 class="text-2xl font-semibold mb-4 text-center text-blue-300 font-['Space_Mono']">Маятник</h3>
-      <p class="text-center mb-6 text-slate-200 font-['Roboto']">Маятниктің тербеліс периоды оның ұзындығына байланысты.</p>
-      <div class="experiment-controls flex justify-center space-x-6 flex-wrap gap-y-4 bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl">
-        <label class="text-white font-['Roboto']">Ұзындығы: <input id="pendulumLength" type="range" min="100" max="350" value="300" class="accent-blue-500"></label>
-        <label class="text-white font-['Roboto']">Бастапқы бұрышы: <input id="pendulumAngle" type="number" value="45" min="10" max="90" class="bg-slate-700 text-white rounded-md px-2 py-1"></label>
-        <button id="resetPendulum" class="group relative bg-blue-600 px-4 py-2 rounded-md text-white font-['Roboto'] font-semibold transition-all duration-500 hover:bg-blue-500 hover:shadow-[0_5px_15px_rgba(59,130,246,0.5)]">Іске қосу/Қайтару</button>
-      </div>
-      <div class="flex justify-center mt-6">
-        <canvas id="pendulumCanvas" width="800" height="400" class="experiment-canvas rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl"></canvas>
-      </div>
-    </div>
-    <!-- Telescope Experiment -->
-    <div class="mb-12">
-      <h3 class="text-2xl font-semibold mb-4 text-center text-blue-300 font-['Space_Mono']">Телескоптық бақылау</h3>
-      <p class="text-center mb-6 text-slate-200 font-['Roboto']">Жұлдыздарды үлкейту үшін курсорды апарыңыз.</p>
-      <div class="experiment-controls flex justify-center space-x-6 flex-wrap gap-y-4 bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl">
-        <label class="text-white font-['Roboto']">Жұлдыздар саны: <input id="starCount" type="number" value="50" min="10" max="200" class="bg-slate-700 text-white rounded-md px-2 py-1"></label>
-        <label class="text-white font-['Roboto']">Макс. масштаб: <input id="starScale" type="number" value="1.5" min="1.0" max="3.0" step="0.1" class="bg-slate-700 text-white rounded-md px-2 py-1"></label>
-        <button id="resetTelescope" class="group relative bg-blue-600 px-4 py-2 rounded-md text-white font-['Roboto'] font-semibold transition-all duration-500 hover:bg-blue-500 hover:shadow-[0_5px_15px_rgba(59,130,246,0.5)]">Іске қосу/Қайтару</button>
-      </div>
-      <div class="flex justify-center mt-6">
-        <canvas id="telescopeCanvas" width="800" height="400" class="experiment-canvas rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl"></canvas>
-      </div>
-    </div>
-    <!-- Jupiter Moons Experiment -->
-    <div class="mb-12">
-      <h3 class="text-2xl font-semibold mb-4 text-center text-blue-300 font-['Space_Mono']">Юпитердің серіктері</h3>
-      <p class="text-center mb-6 text-slate-200 font-['Roboto']">Юпитер серіктерінің орбиталық жылдамдығы.</p>
-      <div class="experiment-controls flex justify-center space-x-6 flex-wrap gap-y-4 bg-[rgba(255,255,255,0.05)] backdrop-blur-lg p-6 rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl">
-        <label class="text-white font-['Roboto']">Жылдамдығы: <input id="moonSpeed" type="range" min="0.005" max="0.05" step="0.005" value="0.02" class="accent-blue-500"></label>
-        <label class="text-white font-['Roboto']">Серіктер саны: <input id="moonCount" type="number" value="4" min="1" max="6" class="bg-slate-700 text-white rounded-md px-2 py-1"></label>
-        <button id="resetJupiterMoons" class="group relative bg-blue-600 px-4 py-2 rounded-md text-white font-['Roboto'] font-semibold transition-all duration-500 hover:bg-blue-500 hover:shadow-[0_5px_15px_rgba(59,130,246,0.5)]">Іске қосу/Қайтару</button>
-      </div>
-      <div class="flex justify-center mt-6">
-        <canvas id="jupiterMoonsCanvas" width="800" height="400" class="experiment-canvas rounded-xl border border-[rgba(255,255,255,0.1)] shadow-xl"></canvas>
-      </div>
-    </div>
-  </div>
-  <!-- Background Decorative Element -->
-  <div class="absolute top-0 left-0 w-full h-full opacity-10 z-0">
-    <svg viewBox="0 0 100 100" class="w-full h-full">
-      <circle cx="50" cy="50" r="40" stroke="rgba(59,130,246,0.3)" stroke-width="1" fill="none"/>
-      <circle cx="20" cy="20" r="10" fill="rgba(59,130,246,0.2)"/>
-      <circle cx="80" cy="80" r="15" fill="rgba(59,130,246,0.2)"/>
-    </svg>
-  </div>
-</section>
-
-  <!-- Quotes Section -->
-<section id="quotes" class="py-16 bg-slate-900 animate-on-scroll fadeInUp">
-  <div class="quotes-container">
-    <h2 class="text-4xl font-bold mb-12 text-center text-white">Дәйексөздер</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div class="quote-card">
-        <p>Табиғат заңдары математикалық тілде жазылған.</p>
-        <cite>— Галилео Галилей</cite>
-      </div>
-      <div class="quote-card">
-        <p>Біз білімсіздік мұхитындағы білім аралдарында өмір сүреміз.</p>
-        <cite>— Галилео Галилей</cite>
-      </div>
-      <div class="quote-card">
-        <p>Сіз ештеңені үйрете алмайсыз; тек олардың ішінде жатқан нәрсені табуға көмектесе аласыз.</p>
-        <cite>— Галилео Галилей</cite>
-      </div>
-      <div class="quote-card">
-        <p>Шындықты іздеу – ең ұлы шытырман оқиға.</p>
-        <cite>— Галилео Галилей</cite>
-      </div>
-      <div class="quote-card">
-        <p>Адамзаттың ең үлкен жетістігі – табиғатты түсіну.</p>
-        <cite>— Галилео Галилей</cite>
-      </div>
-      <div class="quote-card">
-        <p>Фактілермен дауласуға болмайды, өйткені олар шындық.</p>
-        <cite>— Галилео Галилей</cite>
-      </div>
-      <div class="quote-card">
-        <p>Мен өлшемсіз нәрсені өлшеуге тырыстым және өлшеуге болатын нәрсені таптым.</p>
-        <cite>— Галилео Галилей</cite>
-      </div>
-      <div class="quote-card">
-        <p>Жұлдыздарға қарап, шексіздікті сезіну – адам рухының шынайы қуанышы.</p>
-        <cite>— Галилео Галилей</cite>
-      </div>
-      <div class="quote-card">
-        <p>Ақыл мен сезім біріксе, шындықтың жолы ашылады.</p>
-        <cite>— Галилео Галилей</cite>
-      </div>
-    </div>
-  </div>
-</section>
-
-  <!-- Contact Section -->
-<!-- Contact Section -->
-<section id="contact" class="py-20 bg-slate-800 animate-on-scroll fadeInUp relative overflow-hidden">
-  <!-- Contact Section -->
-<div class="container mx-auto px-6 relative z-10">
-  <h2 class="text-5xl font-bold mb-4 text-center text-white font-['Space_Mono'] relative">
-    <span class="relative z-10">Байланыс</span>
-    <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-transparent opacity-30 -z-10 blur-xl"></div>
-  </h2>
-  <div class="w-32 h-1 bg-gradient-to-r from-blue-500 to-blue-300 mx-auto mb-12 rounded-full"></div>
-    <div class="flex justify-center space-x-8 flex-wrap gap-y-6">
-      <!-- Biography Link -->
-      <a href="https://library.vladimir.ru/news/galileo-galilej-istinnoe-znanie-znanie-prichin.html" target="_blank" class="group relative bg-[rgba(255,255,255,0.05)] backdrop-blur-lg px-6 py-3 rounded-lg border border-[rgba(255,255,255,0.1)] shadow-xl text-blue-300 font-['Roboto'] font-semibold transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.5)] hover:-translate-y-1">
-        <span class="relative z-10 flex items-center space-x-2">
-          <svg class="w-5 h-5 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253"></path></svg>
-          <span>Биография</span>
-        </span>
-        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
-      </a>
-      <!-- Britannica Link -->
-      <a href="https://www.nur.kz/family/school/2029725-galileo-galiley-kakie-otkrytiya-sovershil-i-chto-izvestno-o-zhizni-uchenogo/" target="_blank" class="group relative bg-[rgba(255,255,255,0.05)] backdrop-blur-lg px-6 py-3 rounded-lg border border-[rgba(255,255,255,0.1)] shadow-xl text-blue-300 font-['Roboto'] font-semibold transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.5)] hover:-translate-y-1">
-        <span class="relative z-10 flex items-center space-x-2">
-          <svg class="w-5 h-5 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zm0 8c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z"></path></svg>
-          <span>Britannica</span>
-        </span>
-        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
-      </a>
-      <!-- Wikipedia Link -->
-      <a href="https://ru.wikipedia.org/wiki/%D0%93%D0%B0%D0%BB%D0%B8%D0%BB%D0%B5%D0%BE_%D0%93%D0%B0%D0%BB%D0%B8%D0%BB%D0%B5%D0%B9" target="_blank" class="group relative bg-[rgba(255,255,255,0.05)] backdrop-blur-lg px-6 py-3 rounded-lg border border-[rgba(255,255,255,0.1)] shadow-xl text-blue-300 font-['Roboto'] font-semibold transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.5)] hover:-translate-y-1">
-        <span class="relative z-10 flex items-center space-x-2">
-          <svg class="w-5 h-5 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M3 6h18M3 18h18"></path></svg>
-          <span>Уикипедия</span>
-        </span>
-        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
-      </a>
-      <!-- YouTube Shorts Link -->
-      <a href="https://youtube.com/shorts/GqYglZLz_Hw?feature=share" target="_blank" class="group relative bg-[rgba(255,255,255,0.05)] backdrop-blur-lg px-6 py-3 rounded-lg border border-[rgba(255,255,255,0.1)] shadow-xl text-blue-300 font-['Roboto'] font-semibold transition-all duration-500 hover:shadow-[0_10px_30px_rgba(59,130,246,0.5)] hover:-translate-y-1">
-        <span class="relative z-10 flex items-center space-x-2">
-          <svg class="w-5 h-5 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          <span>YouTube Shorts</span>
-        </span>
-        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-lg"></div>
-      </a>
-    </div>
-  </div>
-  <!-- Background Decorative Element -->
-  <div class="absolute top-0 left-0 w-full h-full opacity-10 z-0">
-    <svg viewBox="0 0 100 100" class="w-full h-full">
-      <circle cx="50" cy="50" r="40" stroke="rgba(59,130,246,0.3)" stroke-width="1" fill="none"/>
-      <circle cx="20" cy="20" r="10" fill="rgba(59,130,246,0.2)"/>
-      <circle cx="80" cy="80" r="15" fill="rgba(59,130,246,0.2)"/>
-    </svg>
-  </div>
-</section>
-
-  <!-- YouTube Video Section -->
-  <section id="video" class="py-16 bg-slate-900 animate-on-scroll fadeInUp">
-    <div class="container mx-auto px-4">
-      <h2 class="text-4xl font-bold mb-10 text-center text-white">Галилео Галилей туралы бейнелер</h2>
-      <div class="youtube-section">
-        <div class="youtube-grid">
-          <!-- Video 1 -->
-          <div>
-            <div class="youtube-video">
-              <iframe width="560" height="315" src="https://www.youtube.com/embed/vPZYx9reFm8?si=yprO-_zSHO0XEAhX" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            </div>
-            <div class="video-description">
-              <p class="text-lg">Галилео Галилейдің өмірі мен ғылыми жетістіктерін баяндайтын деректі фильм</p>
-            </div>
-          </div>
-          <!-- Video 2 -->
-          <div>
-            <div class="youtube-video">
-              <iframe width="560" height="315" src="https://www.youtube.com/embed/3Go7nOlWgtg?si=4SVmSx54FLPPh_V5" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            </div>
-            <div class="video-description">
-              <p class="text-lg">Галилео Галилей / Өркениетті өзгерткендер / Астрономия / Телескоп / Жер шары / Италия</p>
-            </div>
-          </div>
-          <!-- Video 3 -->
-          <div>
-            <div class="youtube-video">
-              <iframe width="560" height="315" src="https://www.youtube.com/embed/bBO11D0qa3g?si=D4Mn34d6eRuplnI7" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            </div>
-            <div class="video-description">
-              <p class="text-lg">Галилейдің қозғалыс заңдары және олардың механикадағы маңызы туралы түсіндірме.</p>
-            </div>
-          </div>
-          <!-- Video 4 -->
-          <div>
-            <div class="youtube-video">
-              <iframe width="560" height="315" src="https://www.youtube.com/embed/MkoF4CCC63E?si=OHte3n_TOHZQ-do_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            </div>
-            <div class="video-description">
-              <p class="text-lg">Галилейдің инквизициямен қақтығысы және оның ғылыми мұрасы туралы бейне.</p>
-            </div>
-          </div>
-          <!-- Video 5 -->
-          <div>
-            <div class="youtube-video">
-              <iframe width="560" height="315" src="https://www.youtube.com/embed/LUg682IUxtM?si=Qyhi3LbssWPQqtrc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            </div>
-            <div class="video-description">
-              <p class="text-lg">Атақты ойшылдар.Галилео Галилей.Итальяндық философ,ғалым</p>
-            </div>
-          </div>
-          <!-- Video 6 -->
-          <div>
-            <div class="youtube-video">
-              <iframe width="560" height="315" src="https://www.youtube.com/embed/seMKgQbMDaM?si=ly2uqeCuHUMfDEWX" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            </div>
-            <div class="video-description">
-              <p class="text-lg">Телескоптың өнертабысы: Галилео Галилейден соңғы технологияларға дейін</p>
-            </div>
-          </div>
+        .dark-theme {
+            background-color: #1a1a1a;
+            color: #f4f4f9;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav {
+            background-color: #0056b3;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        nav a {
+            color: white;
+            margin: 0.5rem 1rem;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        nav a:hover {
+            transform: scale(1.1);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .section {
+            margin-bottom: 2rem;
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .section:hover {
+            transform: translateY(-5px);
+        }
+        .dark-theme .section {
+            background-color: #2a2a2a;
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            margin: 1rem 0;
+            border-radius: 8px;
+            max-width: 100%;
+        }
+        .project-planner, .task-list {
+            background-color: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        .dark-theme .project-planner, .dark-theme .task-list {
+            background-color: #3a3a3a;
+        }
+        .project-planner input, .project-planner textarea, .task-list input {
+            padding: 0.7rem;
+            width: 95%;
+            margin: 0.5rem 0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-family: 'Roboto', sans-serif;
+        }
+        .project-planner button, .task-list button {
+            padding: 0.7rem 1.5rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0.5rem 0;
+            transition: background-color 0.2s;
+        }
+        .project-planner button:hover, .task-list button:hover {
+            background-color: #0056b3;
+        }
+        .task-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        .task-list li {
+            padding: 0.7rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.7rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        footer {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+        @media (max-width: 600px) {
+            nav {
+                flex-direction: column;
+            }
+            .project-planner input, .task-list input, .project-planner textarea {
+                width: 90%;
+            }
+        }
+        .dark-theme #chat-box {
+        background: #3a3a3a !important;
+        }
+        .chat-message {
+            margin: 10px 0;
+            display: flex;
+            align-items: flex-start;
+            animation: fadeIn 0.3s ease-in;
+        }
+        .chat-message.user {
+            justify-content: flex-end;
+        }
+        .chat-message .bubble {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 10px;
+            position: relative;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .chat-message.user .bubble {
+            background-color: #007bff;
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+        .chat-message.ai .bubble {
+            background-color: #e9ecef;
+            color: #333;
+            border-bottom-left-radius: 2px;
+        }
+        .dark-theme .chat-message.ai .bubble {
+            background-color: #4a4a4a;
+            color: #f4f4f9;
+        }
+        .chat-message .bubble::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border: 8px solid transparent;
+        }
+        .chat-message.user .bubble::before {
+            border-left-color: #007bff;
+            border-right: none;
+            right: -8px;
+            top: 10px;
+        }
+        .chat-message.ai .bubble::before {
+            border-right-color: #e9ecef;
+            border-left: none;
+            left: -8px;
+            top: 10px;
+        }
+        .dark-theme .chat-message.ai .bubble::before {
+            border-right-color: #4a4a4a;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 600px) {
+            .chat-message .bubble {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">Тёмная тема</button>
+    <header>
+        <h1>Оқытуда жобалау әдісінің маңызы</h1>
+    </header>
+    <nav>
+        <a href="#home">Басты бет</a>
+        <a href="#info">Ақпарат</a>
+        <a href="#videos">Бейнелер</a>
+        <a href="#animation">Анимация</a>
+        <a href="#tools">Құралдар</a>
+        <a href="#resources">Ресурстар</a>
+    </nav>
+    <div class="container">
+        <div id="home" class="section">
+            <h2>Жобалау әдісі дегеніміз не?</h2>
+            <p>Жобалау әдісі – студенттердің шығармашылық және сыни ойлауын дамытатын, практикалық тапсырмалар арқылы білімді тереңдететін оқыту технологиясы. Бұл әдіс теория мен практиканы байланыстырады, студенттердің өз бетінше шешім қабылдау және жауапкершілікті сезіну қабілеттерін арттырады.</p>
         </div>
-      </div>
+        <div id="info" class="section">
+            <h2>Жобалау әдісі туралы толығырақ</h2>
+            <h3>Негізгі кезеңдер</h3>
+            <ul>
+                <li><strong>Мәселені анықтау</strong>: Нақты мәселені немесе сұрақты анықтау.</li>
+                <li><strong>Жоспарлау</strong>: Жобаның мақсаттары, ресурстары және мерзімдерін анықтау.</li>
+                <li><strong>Зерттеу</strong>: Ақпарат жинау және талдау.</li>
+                <li><strong>Жүзеге асыру</strong>: Жоспарды орындау, прототиптер құру.</li>
+                <li><strong>Рефлексия</strong>: Нәтижелерді бағалау және қорытынды шығару.</li>
+            </ul>
+            <h3>Түрлері</h3>
+            <p>
+                - <strong>Жеке жобалар</strong>: Студенттің жеке қызығушылығына негізделген.<br>
+                - <strong>Топтық жобалар</strong>: Коллаборация және коммуникация дағдыларын дамытады.<br>
+                - <strong>Пәнаралық жобалар</strong>: Бірнеше пәнді біріктіреді (мысалы, биология + информатика).
+            </p>
+            <h3>Мысал</h3>
+            <p>Қалалық мектепте студенттер қоғамдық бақ жобасын жасады: мәселені анықтады (бақтың ластануы), жоспар құрды, зерттеу жүргізді, тазалау іс-шарасын ұйымдастырды және нәтижелерді қоғамдастыққа ұсынды.</p>
+        </div>
+        <div id="videos" class="section">
+            <h2 >Бейнелер</h2>
+            <p><a href="https://drive.google.com/drive/folders/1h_9o8GTLUcLtdGJ_Zxex21vgxNucN8Mz?usp=drive_linkl">Видео және презентация</a></p>
+        </div>
+        <div id="animation" class="section">
+            <h2>Жобалау кезеңдерінің анимациясы</h2>
+            <canvas id="animationCanvas" width="600" height="400"></canvas>
+        </div>
+        <div id="tools" class="section">
+            <h2>Жобалауға арналған құралдар</h2>
+            <div class="project-planner">
+                <h3>Жоба жоспары конструкторы</h3>
+                <input type="text" id="projectTitle" placeholder="Жобаның атауы">
+                <textarea id="projectGoals" placeholder="Жобаның мақсаттары"></textarea>
+                <input type="text" id="projectTimeline" placeholder="Мерзімдер (мысалы, 01.06.2025 - 15.06.2025)">
+                <textarea id="projectResources" placeholder="Қажетті ресурстар (мысалы, материалдар, бағдарламалар)"></textarea>
+                <input type="text" id="taskInput" placeholder="Жаңа тапсырма енгізіңіз">
+                <button onclick="addTask()">Тапсырма қосу</button>
+                <ul id="taskList"></ul>
+                <button onclick="saveProject()">Жоспарды сақтау</button>
+                <button onclick="exportToWord()">Word форматында жүктеу</button>
+                <div id="projectList"></div>
+            </div>
+        </div>
+        <div id="resources" class="section">
+            <div class="section">
+                <div class="section-title">Болашақ информатика мұғалімдеріне ұсыныстар</div>
+                <ol>
+                  <li>
+                    <strong>Жобалау әдісін оқу процесіне белсенді енгізіңіз:</strong> оқушыларға шынайы өмірмен байланысты тапсырмалар беріңіз (мысалы: экологиялық қосымша, оқу процесін жеңілдететін бағдарлама).
+                  </li>
+                  <li>
+                    <strong>Пәнаралық байланыстарды күшейтіңіз:</strong> математика, физика, дизайн сынды пәндерді біріктіретін жобалар әзірлеңіз.
+                  </li>
+                  <li>
+                    <strong>Оқушылардың дербестігі мен жауапкершілігін ынталандырыңыз:</strong> жоба тақырыбын таңдауда еркіндік беріп, бағыт-бағдар көрсетіңіз.
+                  </li>
+                  <li>
+                    <strong>Цифрлық технологияларды тиімді пайдаланыңыз:</strong> Google Classroom, Trello, GitHub және AI/VR технологияларын қолданыңыз.
+                  </li>
+                  <li>
+                    <strong>Этика және академиялық адалдық мәселелеріне мән беріңіз:</strong> ақпарат көздерін дұрыс қолдануға және топтық әділдікке үйретіңіз.
+                  </li>
+                  <li>
+                    <strong>Рефлексия және кері байланысқа уақыт бөліңіз:</strong> жоба соңында оқушылармен талқылау жүргізіңіз.
+                  </li>
+                  <li>
+                    <strong>Кәсіби дамуды тоқтатпаңыз:</strong> тренингтер мен халықаралық курстар арқылы біліміңізді жетілдіріңіз.
+                  </li>
+                  <li>
+                    <strong>Оқушыларды болашақ мамандықтарға бағыттаңыз:</strong> IT саласындағы мүмкіндіктерді көрсету арқылы мотивацияны арттырыңыз.
+                  </li>
+                </ol>
+              </div>
+        </div>
     </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="bg-slate-900 text-white py-6">
-    <div class="container mx-auto px-4 text-center">
-      <p>© 2025 Галилей коды. Барлық құқықтар қорғалған.</p>
+    <div id="ai-assistant" class="section">
+        <h3>Көмекшімен сөйлесу (ИИ)</h3>
+        <div id="chat-box" style="max-height: 400px; overflow-y: auto; margin-bottom: 10px; padding: 10px; border-radius: 8px; background: #f9f9f9;" class="dark-theme-background">
+            <!-- Сообщения будут добавляться сюда -->
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="user-input" placeholder="Сұрағыңызды жазыңыз..." style="flex: 1; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-family: 'Roboto', sans-serif;" />
+            <button onclick="sendMessage()" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.2s;">Жіберу</button>
+        </div>
     </div>
-  </footer>
+      
+    <footer>
+        <p>Мамандық атауы: 01140700 «Информатика»<br>
+            Біліктілік: 4S01140701 Бастауыш жəне негізгі орта білім берудің информатика мұғалімі<br>
+            Пән: Педагогика<br>
+            Орындаған: ИК-921 тобының студенті Бокен Ерсұлтан<br>
+            Ғылыми жетекшісі: п.ғ.м. Макашева К.Ж.
+          </p>
+    </footer>
+    <script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script>
+        // Тёмная тема
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
+        }
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
 
-  <!-- Back to Top Button -->
-  <button id="backToTop" class="fixed bottom-8 right-8 bg-blue-500 text-white px-4 py-3 rounded-full shadow-lg hidden btn-animated">
-    ↑
-  </button>
-
-  <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
-  <script>
-    // Solar System Animation Initialization
-    $(window).on('load', function() {
-      var body = $("body"),
-          universe = $("#universe"),
-          solarsys = $("#solar-system");
-
-      var init = function() {
-        body.removeClass('view-2D opening').addClass("view-3D").delay(2000).queue(function() {
-          $(this).removeClass('hide-UI').addClass("set-speed");
-          $(this).dequeue();
-        });
-      };
-
-      init();
-    });
-
-    // Planet Buttons
-    document.addEventListener("DOMContentLoaded", () => {
-      const buttons = document.querySelectorAll(".planet-button");
-      const speedInfo = document.getElementById("speed-info");
-      buttons.forEach(button => {
-        button.addEventListener("click", () => {
-          buttons.forEach(btn => btn.classList.remove("active"));
-          button.classList.add("active");
-          const planet = button.dataset.planet;
-          const speed = button.dataset.speed;
-          speedInfo.textContent = `Ғаламшар жылдамдығы ${planet.charAt(0).toUpperCase() + planet.slice(1)}: ${speed}`;
-          speedInfo.classList.add("show");
-        });
-      });
-    });
-
-    // Starry Background
-    document.addEventListener("DOMContentLoaded", () => {
-      const canvas = document.querySelector(".stars");
-      const ctx = canvas.getContext("2d");
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      const stars = Array.from({ length: 200 }, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        radius: Math.random() * 2 + 1,
-        speed: Math.random() * 0.5 + 0.1
-      }));
-      function animateStars() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        stars.forEach(star => {
-          ctx.beginPath();
-          ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.5})`;
-          ctx.fill();
-          star.y += star.speed;
-          if (star.y > canvas.height) star.y = 0;
-        });
-        requestAnimationFrame(animateStars);
-      }
-      animateStars();
-      window.addEventListener("resize", () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      });
-    });
-
-    // Navigation Toggle
-    document.addEventListener("DOMContentLoaded", () => {
-      const toggle = document.getElementById("menu-toggle");
-      const menu = document.getElementById("menu");
-      toggle.addEventListener("click", () => menu.classList.toggle("hidden"));
-    });
-
-    // Falling Bodies Experiment
-    document.addEventListener("DOMContentLoaded", () => {
-      const canvas = document.getElementById("fallingBodiesCanvas");
-      const ctx = canvas.getContext("2d");
-      let isRunning = false;
-      let animationFrameId;
-      let balls = [
-        { x: 200, y: 50, radius: 20, vy: 0, color: "#ef4444" },
-        { x: 600, y: 50, radius: 10, vy: 0, color: "#3b82f6" }
-      ];
-      let gravity = 0.4;
-
-      const mass1Input = document.getElementById("mass1");
-      const mass2Input = document.getElementById("mass2");
-      const gravityInput = document.getElementById("gravity");
-      const resetButton = document.getElementById("resetFallingBodies");
-
-      function reset() {
-        cancelAnimationFrame(animationFrameId);
-        balls = [
-          { x: 200, y: 50, radius: parseInt(mass1Input.value), vy: 0, color: "#ef4444" },
-          { x: 600, y: 50, radius: parseInt(mass2Input.value), vy: 0, color: "#3b82f6" }
+        // Canvas анимациясы (этапы проектирования)
+        const canvas = document.getElementById('animationCanvas');
+        const ctx = canvas.getContext('2d');
+        const stages = [
+            { name: 'Мәселе', x: 100, y: 100, desc: 'Нақты мәселені анықтау' },
+            { name: 'Жоспар', x: 200, y: 200, desc: 'Мақсаттар мен мерзімдерді белгілеу' },
+            { name: 'Зерттеу', x: 300, y: 100, desc: 'Ақпарат жинау және талдау' },
+            { name: 'Жүзеге асыру', x: 400, y: 200, desc: 'Жоспарды орындау' },
+            { name: 'Рефлексия', x: 500, y: 100, desc: 'Нәтижелерді бағалау' }
         ];
-        gravity = parseFloat(gravityInput.value);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        isRunning = false;
-      }
 
-      function animateFallingBodies() {
-        if (!isRunning) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        balls.forEach(ball => {
-          ctx.beginPath();
-          ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-          ctx.fillStyle = ball.color;
-          ctx.fill();
-          ball.vy += gravity;
-          ball.y += ball.vy;
-          if (ball.y + ball.radius > canvas.height) {
-            ball.y = canvas.height - ball.radius;
-            ball.vy = 0;
-          }
+        function drawStages() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '16px Roboto';
+            ctx.fillStyle = '#007bff';
+            ctx.strokeStyle = '#007bff';
+
+            for (let i = 0; i < stages.length; i++) {
+                ctx.beginPath();
+                ctx.arc(stages[i].x, stages[i].y, 30, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = 'white';
+                ctx.fillText(stages[i].name, stages[i].x - 25, stages[i].y + 5);
+                ctx.fillStyle = '#007bff';
+                if (i < stages.length - 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(stages[i].x, stages[i].y);
+                    ctx.lineTo(stages[i + 1].x, stages[i + 1].y);
+                    ctx.stroke();
+                }
+            }
+        }
+        drawStages();
+
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            stages.forEach(stage => {
+                const dx = mouseX - stage.x;
+                const dy = mouseY - stage.y;
+                if (Math.sqrt(dx * dx + dy * dy) < 30) {
+                    alert(`${stage.name}: ${stage.desc}`);
+                }
+            });
         });
-        animationFrameId = requestAnimationFrame(animateFallingBodies);
-      }
 
-      resetButton.addEventListener("click", () => {
-        reset();
-        isRunning = !isRunning;
-        if (isRunning) animateFallingBodies();
-      });
+        // Тапсырмалар тізімі
+        let tasks = [];
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskList = document.getElementById('taskList');
+            const taskText = taskInput.value.trim();
+            if (taskText) {
+                tasks.push(taskText);
+                const li = document.createElement('li');
+                li.textContent = taskText;
+                taskList.appendChild(li);
+                saveTasks();
+                taskInput.value = '';
+            }
+        }
 
-      mass1Input.addEventListener("input", reset);
-      mass2Input.addEventListener("input", reset);
-      gravityInput.addEventListener("input", reset);
-    });
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
 
-    // Pendulum Experiment
-    document.addEventListener("DOMContentLoaded", () => {
-      const canvas = document.getElementById("pendulumCanvas");
-      const ctx = canvas.getContext("2d");
-      const pivot = { x: canvas.width / 2, y: 50 };
-      let isRunning = false;
-      let animationFrameId;
-      let length = 300;
-      let angle = Math.PI / 4;
-      let angleVel = 0;
-      let gravity = 0.01;
+        function loadTasks() {
+            const savedTasks = localStorage.getItem('tasks');
+            if (savedTasks) {
+                tasks = JSON.parse(savedTasks);
+                const taskList = document.getElementById('taskList');
+                tasks.forEach(task => {
+                    const li = document.createElement('li');
+                    li.textContent = task;
+                    taskList.appendChild(li);
+                });
+            }
+        }
 
-      const lengthInput = document.getElementById("pendulumLength");
-      const angleInput = document.getElementById("pendulumAngle");
-      const resetButton = document.getElementById("resetPendulum");
+        // Жоба жоспары
+        function saveProject() {
+            const title = document.getElementById('projectTitle').value;
+            const goals = document.getElementById('projectGoals').value;
+            const timeline = document.getElementById('projectTimeline').value;
+            const resources = document.getElementById('projectResources').value;
+            if (title && goals && timeline) {
+                const projectList = document.getElementById('projectList');
+                const projectDiv = document.createElement('div');
+                projectDiv.innerHTML = `<strong>${title}</strong><br>Мақсаттар: ${goals}<br>Мерзімдер: ${timeline}<br>Ресурстар: ${resources}<br>Тапсырмалар: ${tasks.join(', ')}`;
+                projectList.appendChild(projectDiv);
+                localStorage.setItem('projects', projectList.innerHTML);
+                document.getElementById('projectTitle').value = '';
+                document.getElementById('projectGoals').value = '';
+                document.getElementById('projectTimeline').value = '';
+                document.getElementById('projectResources').value = '';
+                tasks = [];
+                document.getElementById('taskList').innerHTML = '';
+                localStorage.removeItem('tasks');
+            }
+        }
 
-      function reset() {
-        cancelAnimationFrame(animationFrameId);
-        length = parseInt(lengthInput.value);
-        angle = (parseInt(angleInput.value) * Math.PI) / 180;
-        angleVel = 0;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        isRunning = false;
-      }
+        function loadProjects() {
+            const savedProjects = localStorage.getItem('projects');
+            if (savedProjects) {
+                document.getElementById('projectList').innerHTML = savedProjects;
+            }
+        }
 
-      function animatePendulum() {
-        if (!isRunning) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const ball = {
-          x: pivot.x + length * Math.sin(angle),
-          y: pivot.y + length * Math.cos(angle)
+        // Word файлына экспорттау
+        function exportToWord() {
+            const title = document.getElementById('projectTitle').value || 'Жоба жоспары';
+            const goals = document.getElementById('projectGoals').value || 'Мақсаттар анықталмаған';
+            const timeline = document.getElementById('projectTimeline').value || 'Мерзімдер анықталмаған';
+            const resources = document.getElementById('projectResources').value || 'Ресурстар анықталмаған';
+
+            const doc = new docx.Document({
+                sections: [{
+                    properties: {},
+                    children: [
+                        new docx.Paragraph({
+                            children: [
+                                new docx.TextRun({
+                                    text: "Жоба жоспары",
+                                    bold: true,
+                                    size: 32
+                                })
+                            ],
+                            spacing: { after: 200 }
+                        }),
+                        new docx.Paragraph({
+                            children: [
+                                new docx.TextRun({
+                                    text: `Атауы: ${title}`,
+                                    bold: true
+                                })
+                            ],
+                            spacing: { after: 100 }
+                        }),
+                        new docx.Paragraph({
+                            children: [new docx.TextRun(`Мақсаттар: ${goals}`)]
+                        }),
+                        new docx.Paragraph({
+                            children: [new docx.TextRun(`Мерзімдер: ${timeline}`)]
+                        }),
+                        new docx.Paragraph({
+                            children: [new docx.TextRun(`Ресурстар: ${resources}`)]
+                        }),
+                        new docx.Paragraph({
+                            children: [
+                                new docx.TextRun({
+                                    text: "Тапсырмалар:",
+                                    bold: true
+                                })
+                            ],
+                            spacing: { before: 200 }
+                        }),
+                        ...tasks.map(task => new docx.Paragraph({
+                            children: [new docx.TextRun(`- ${task}`)]
+                        }))
+                    ]
+                }]
+            });
+
+            docx.Packer.toBlob(doc).then(blob => {
+                saveAs(blob, `${title || "Жоба_жоспары"}.docx`);
+            });
+        }
+
+        window.onload = () => {
+            loadTasks();
+            loadProjects();
         };
-        ctx.beginPath();
-        ctx.moveTo(pivot.x, pivot.y);
-        ctx.lineTo(ball.x, ball.y);
-        ctx.strokeStyle = "#94a3b8";
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, 20, 0, Math.PI * 2);
-        ctx.fillStyle = "#f59e0b";
-        ctx.fill();
-        const angleAcc = (-gravity * Math.sin(angle)) / (length / 300);
-        angleVel += angleAcc;
-        angle += angleVel;
-        angleVel *= 0.99;
-        animationFrameId = requestAnimationFrame(animatePendulum);
-      }
-
-      resetButton.addEventListener("click", () => {
-        reset();
-        isRunning = !isRunning;
-        if (isRunning) animatePendulum();
-      });
-
-      lengthInput.addEventListener("input", reset);
-      angleInput.addEventListener("input", reset);
-    });
-
-    // Telescope Experiment
-    document.addEventListener("DOMContentLoaded", () => {
-      const canvas = document.getElementById("telescopeCanvas");
-      const ctx = canvas.getContext("2d");
-      let isRunning = false;
-      let animationFrameId;
-      let stars = [];
-      let starCount = 50;
-      let maxScale = 1.5;
-
-      const starCountInput = document.getElementById("starCount");
-      const starScaleInput = document.getElementById("starScale");
-      const resetButton = document.getElementById("resetTelescope");
-
-      function resetStars() {
-        starCount = parseInt(starCountInput.value);
-        maxScale = parseFloat(starScaleInput.value);
-        stars = Array.from({ length: starCount }, () => ({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          radius: Math.random() * 5 + 2,
-          brightness: Math.random(),
-          scale: 1
-        }));
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        isRunning = false;
-      }
-
-      canvas.addEventListener("mousemove", (e) => {
-        if (!isRunning) return;
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        stars.forEach(star => {
-          const dx = star.x - mouseX;
-          const dy = star.y - mouseY;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          star.brightness = Math.max(0, 1 - distance / 100);
-          star.scale = distance < 50 ? maxScale : 1;
-        });
-      });
-
-      function animateTelescope() {
-        if (!isRunning) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#0f172a";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        stars.forEach(star => {
-          ctx.beginPath();
-          ctx.arc(star.x, star.y, star.radius * star.scale, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
-          ctx.fill();
-        });
-        animationFrameId = requestAnimationFrame(animateTelescope);
-      }
-
-      resetButton.addEventListener("click", () => {
-        resetStars();
-        isRunning = !isRunning;
-        if (isRunning) animateTelescope();
-      });
-
-      starCountInput.addEventListener("input", resetStars);
-      starScaleInput.addEventListener("input", resetStars);
-    });
-
-    // Jupiter Moons Experiment
-    document.addEventListener("DOMContentLoaded", () => {
-    const canvas = document.getElementById("jupiterMoonsCanvas");
-    const ctx = canvas.getContext("2d");
-    let isRunning = false;
-    let animationFrameId;
-    const jupiter = { x: canvas.width / 2, y: canvas.height / 2, radius: 50 };
-    let speed = 0.02;
-    let moonCount = 4;
-    let moons = [];
-
-    const speedInput = document.getElementById("moonSpeed");
-    const moonCountInput = document.getElementById("moonCount");
-    const resetButton = document.getElementById("resetJupiterMoons");
-
-    function resetMoons() {
-      speed = parseFloat(speedInput.value);
-      moonCount = parseInt(moonCountInput.value);
-      moons = Array.from({ length: moonCount }, (_, i) => ({
-        distance: 100 + i * 50,
-        angle: (i * 2 * Math.PI) / moonCount,
-        speed,
-        radius: 5 + i
-      }));
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      isRunning = false;
-    }
-
-    function animateJupiterMoons() {
-      if (!isRunning) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.beginPath();
-      ctx.arc(jupiter.x, jupiter.y, jupiter.radius, 0, Math.PI * 2);
-      ctx.fillStyle = "#f97316";
-      ctx.fill();
-      moons.forEach(moon => {
-        const x = jupiter.x + moon.distance * Math.cos(moon.angle);
-        const y = jupiter.y + moon.distance * Math.sin(moon.angle);
-        ctx.beginPath();
-        ctx.arc(x, y, moon.radius, 0, Math.PI * 2);
-        ctx.fillStyle = "#cbd5e1";
-        ctx.fill();
-        moon.angle += moon.speed;
-      });
-      animationFrameId = requestAnimationFrame(animateJupiterMoons);
-    }
-
-    resetButton.addEventListener("click", () => {
-      resetMoons();
-      isRunning = !isRunning;
-      if (isRunning) animateJupiterMoons();
-    });
-
-    speedInput.addEventListener("input", resetMoons);
-    moonCountInput.addEventListener("input", resetMoons); // Завершение незавершенного обработчика
-  });
-
-  // Heliocentric Model Experiment
-  document.addEventListener("DOMContentLoaded", () => {
-    const canvas = document.getElementById("heliocentricCanvas");
-    const ctx = canvas.getContext("2d");
-    let isRunning = false;
-    let animationFrameId;
-    const sun = { x: canvas.width / 2, y: canvas.height / 2, radius: 50 };
-    let earthSpeed = 0.02;
-    let venusSpeed = 0.01;
-    const planets = [
-      {
-        name: "earth",
-        distance: 150,
-        angle: 0,
-        speed: earthSpeed,
-        radius: 20,
-        color: "#3b82f6"
-      },
-      {
-        name: "venus",
-        distance: 100,
-        angle: Math.PI,
-        speed: venusSpeed,
-        radius: 15,
-        color: "#f59e0b"
-      }
-    ];
-
-    const earthSpeedInput = document.getElementById("earthSpeed");
-    const venusSpeedInput = document.getElementById("venusSpeed");
-    const resetButton = document.getElementById("resetHeliocentric");
-
-    function resetHeliocentric() {
-      earthSpeed = parseFloat(earthSpeedInput.value);
-      venusSpeed = parseFloat(venusSpeedInput.value);
-      planets[0].speed = earthSpeed;
-      planets[1].speed = venusSpeed;
-      planets[0].angle = 0;
-      planets[1].angle = Math.PI;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      isRunning = false;
-    }
-
-    function animateHeliocentric() {
-      if (!isRunning) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw Sun
-      ctx.beginPath();
-      ctx.arc(sun.x, sun.y, sun.radius, 0, Math.PI * 2);
-      ctx.fillStyle = "#facc15";
-      ctx.fill();
-
-      // Draw planet orbits
-      planets.forEach(planet => {
-        ctx.beginPath();
-        ctx.arc(sun.x, sun.y, planet.distance, 0, Math.PI * 2);
-        ctx.strokeStyle = "#94a3b8";
-        ctx.stroke();
-      });
-
-      // Draw planets
-      planets.forEach(planet => {
-        const x = sun.x + planet.distance * Math.cos(planet.angle);
-        const y = sun.y + planet.distance * Math.sin(planet.angle);
-        ctx.beginPath();
-        ctx.arc(x, y, planet.radius, 0, Math.PI * 2);
-        ctx.fillStyle = planet.color;
-        ctx.fill();
-        planet.angle += planet.speed;
-      });
-
-      animationFrameId = requestAnimationFrame(animateHeliocentric);
-    }
-
-    resetButton.addEventListener("click", () => {
-      resetHeliocentric();
-      isRunning = !isRunning;
-      if (isRunning) animateHeliocentric();
-    });
-
-    earthSpeedInput.addEventListener("input", resetHeliocentric);
-    venusSpeedInput.addEventListener("input", resetHeliocentric);
-  });
-</script>
+    </script>  
+</body>
+</html>
